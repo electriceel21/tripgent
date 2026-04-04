@@ -1,0 +1,38 @@
+{
+  "cli": {
+    "version": "16.32.0",
+    "appVersionSource": "local"
+  },
+  "build": {
+    "development": {
+      "extends": "base",
+      "developmentClient": true,
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      }
+    },
+    "preview": {
+      "extends": "base",
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      }
+    },
+    "production": {
+      "extends": "base",
+      "android": {
+        "buildType": "app-bundle"
+      }
+    },
+    "base": {
+      "node": "20.18.1",
+      "env": {
+        "NODE_OPTIONS": "--max-old-space-size=8192"
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}

@@ -77,6 +77,8 @@ pnpm dev:mobile
 # alias: pnpm dev:customer
 ```
 
+**Android APK (EAS):** `apps/mobile/eas.json` defines a **`preview`** profile that builds an **APK** for internal install. From `apps/mobile`, run **`eas login`**, then **`pnpm eas:init`** (links the app to your Expo account and writes `expo.extra.eas.projectId` in `app.json`). Configure **`EXPO_PUBLIC_TRIPGENT_API_URL`**, **`EXPO_PUBLIC_DYNAMIC_*`**, etc. as [EAS environment variables](https://docs.expo.dev/build-reference/variables/) for the preview profile, then **`pnpm eas:build:android`**. CI can use **`EXPO_TOKEN`** instead of `eas login`.
+
 ## API
 
 - **`/v1/admin/*`** — CRUD for sponsors, locations, reward pools, offers, purchases; dashboard counts. Uses **Supabase** via `SUPABASE_SERVICE_ROLE_KEY`. Set **`ADMIN_API_KEY`** and send `x-admin-key` (or `Authorization: Bearer`) in production.

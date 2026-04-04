@@ -1,5 +1,6 @@
 {
   "expo": {
+    "owner": "riverplates-organization",
     "name": "Tripgent",
     "slug": "tripgent",
     "scheme": "tripgent",
@@ -20,6 +21,11 @@
     "plugins": [
       "expo-router",
       "expo-secure-store"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "ec88581c-8161-4ad1-b57a-797e10478c1c"
+      }
+    }
   }
 }
