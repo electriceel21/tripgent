@@ -43,15 +43,19 @@ See the [React Native quickstart](https://www.dynamic.xyz/docs/react-native/refe
 
 ## Setup
 
+Use **one** env file at the **repository root**:
+
 ```bash
 pnpm install
-cp apps/api/.env.example apps/api/.env
-# SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY (service role = server only)
-# RPC_URL, PRIVATE_KEY, PROVIDER_ADDRESS (for /v1/chat)
-
-cp apps/mobile/.env.example apps/mobile/.env
-# EXPO_PUBLIC_* ; use your LAN IP for EXPO_PUBLIC_TRIPGENT_API_URL on a physical device
+cp .env.example .env
+# Edit .env: Supabase, chat keys (0G proxy or OpenAI or broker), EXPO_PUBLIC_* for mobile, etc.
 ```
+
+- **`apps/api`** loads `../../.env` automatically (`load-root-env`).
+- **`apps/admin`** loads the same file from `next.config.ts` (plus optional `apps/admin/.env.local` for overrides).
+- **`apps/mobile`** injects `../../.env` via **`dotenv-cli`** on `pnpm start` / `ios` / `android`.
+
+**EAS / store builds** do not read the repo-root `.env`; set **`EXPO_PUBLIC_*`** (and secrets) in [EAS env](https://docs.expo.dev/build-reference/variables/) or your CI.
 
 Run **admin + API together** (recommended — one origin, same as Vercel):
 
@@ -92,7 +96,7 @@ The Hono app is mounted from **`@tripgent/api`** on **`apps/admin/src/app/api/[[
 
 1. Import the Git repo on [Vercel](https://vercel.com).
 2. Set **Root Directory** to **`apps/admin`**.
-3. **Environment variables** (Production / Preview): copy everything your API needs from **`apps/api/.env.example`** — at minimum **`SUPABASE_URL`**, **`SUPABASE_SERVICE_ROLE_KEY`**, plus chat keys (**`ZG_COMPUTE_*`** / **`OPENAI_*`** / **`RPC_URL`**, **`PRIVATE_KEY`**, **`PROVIDER_ADDRESS`**) as you use locally. Add **`ADMIN_API_KEY`**, **`API_AUTH_BEARER`**, **`CORS_ORIGINS`** (comma-separated; include your Expo / web origins when calling from a device) as needed.
+3. **Environment variables** (Production / Preview): mirror your local **root** **`.env`** (see **`.env.example`** in the repo) — at minimum **`SUPABASE_URL`**, **`SUPABASE_SERVICE_ROLE_KEY`**, plus chat keys (**`ZG_COMPUTE_*`** / **`OPENAI_*`** / **`RPC_URL`**, **`PRIVATE_KEY`**, **`PROVIDER_ADDRESS`**) as you use locally. Add **`ADMIN_API_KEY`**, **`API_AUTH_BEARER`**, **`CORS_ORIGINS`** (comma-separated; include your Expo / web origins when calling from a device) as needed.
 4. Vercel uses **`apps/admin/vercel.json`**: install from the monorepo root with pnpm, then builds **`@tripgent/api`** and **`@tripgent/admin`**.
 5. **Mobile:** set **`EXPO_PUBLIC_TRIPGENT_API_URL`** to `https://<your-deployment>.vercel.app` (no trailing slash). Paths are still **`/v1/chat`**, etc.
 6. **Function duration:** `route.ts` sets **`maxDuration = 300`** (requires Vercel Pro or higher for more than 10s). **Hobby** caps at **10s** — long LLM calls may time out unless you upgrade or use a faster model path.

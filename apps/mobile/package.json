@@ -12,9 +12,9 @@
   },
   "main": "expo-router/entry",
   "scripts": {
-    "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
+    "start": "dotenv -e ../../.env -- expo start",
+    "android": "dotenv -e ../../.env -- expo start --android",
+    "ios": "dotenv -e ../../.env -- expo start --ios",
     "lint": "tsc --noEmit"
   },
   "dependencies": {
@@ -35,6 +35,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.26.0",
+    "dotenv-cli": "^7.4.4",
     "@types/react": "~18.3.12",
     "typescript": "^5.7.2"
   }

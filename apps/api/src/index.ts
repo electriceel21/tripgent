@@ -1,6 +1,8 @@
-import "dotenv/config";
+import { loadRootEnv } from "./load-root-env.js";
 import { serve } from "@hono/node-server";
 import { createTripgentApp } from "./create-app.js";
+
+loadRootEnv();
 
 const app = createTripgentApp();
 

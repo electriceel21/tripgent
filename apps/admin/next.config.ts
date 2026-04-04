@@ -1,8 +1,11 @@
 import type { NextConfig } from "next";
+import { config as loadEnv } from "dotenv";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+/** Monorepo root `.env` (same file as API + mobile dev). */
+loadEnv({ path: path.resolve(__dirname, "../../.env") });
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,

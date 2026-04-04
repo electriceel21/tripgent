@@ -6,7 +6,10 @@ import assert from "node:assert/strict";
 import { Hono } from "hono";
 import { createAdminApp, getUserProfileHandler } from "./admin-routes.js";
 import { createServiceClient } from "./db.js";
+import { loadRootEnv } from "./load-root-env.js";
 import { computeTier, reputationGainForPurchase } from "./reputation.js";
+
+loadRootEnv();
 
 assert.equal(computeTier(0, 0), "bronze");
 assert.equal(computeTier(1, 0), "silver");
