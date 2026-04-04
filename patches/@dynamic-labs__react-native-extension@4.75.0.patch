@@ -1,0 +1,25 @@
+diff --git a/android/build.gradle b/android/build.gradle
+index 15e40dc693fbe472c487995e575a6c2ad203d351..910eff43fa8fad6b47cd82528ebea0e36a10562c 100644
+--- a/android/build.gradle
++++ b/android/build.gradle
+@@ -1,6 +1,11 @@
+ apply plugin: 'com.android.library'
+ apply plugin: 'kotlin-android'
+-apply plugin: 'expo-module-gradle-plugin'
++
++// Expo SDK 52+ no longer ships the standalone `expo-module-gradle-plugin` id on the classpath.
++// Use the same ExpoModulesCore integration as first-party expo modules (e.g. expo-secure-store).
++def expoModulesCorePlugin = new File(project(":expo-modules-core").projectDir.absolutePath, "ExpoModulesCorePlugin.gradle")
++apply from: expoModulesCorePlugin
++applyKotlinExpoModulesCorePlugin()
+ 
+ def packageJsonFile = file('../package.json')
+ def packageJson = new groovy.json.JsonSlurper().parseText(packageJsonFile.text)
+@@ -32,7 +37,3 @@ android {
+ dependencies {
+   implementation project(':expo-modules-core')
+ }
+-
+-def safeExtGet(prop, fallback) {
+-  rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
+-}

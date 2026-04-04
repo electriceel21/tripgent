@@ -6,6 +6,9 @@
     "overrides": {
       "react": "18.3.1",
       "react-dom": "18.3.1"
+    },
+    "patchedDependencies": {
+      "@dynamic-labs/react-native-extension@4.75.0": "patches/@dynamic-labs__react-native-extension@4.75.0.patch"
     }
   },
   "scripts": {
