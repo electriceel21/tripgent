@@ -2,13 +2,13 @@ import { ethers } from "ethers";
 import { createZGComputeNetworkBroker } from "@0glabs/0g-serving-broker";
 import type { ChatMessage } from "@tripgent/shared";
 
-export type InferenceConfig = {
+type InferenceConfig = {
   rpcUrl: string;
   privateKey: string;
   providerAddress: string;
 };
 
-export type OpenAICompatConfig = {
+type OpenAICompatConfig = {
   apiKey: string;
   baseUrl: string;
   model: string;
@@ -23,9 +23,7 @@ export type OpenAICompatConfig = {
  * **Other providers:** `OPENAI_API_KEY` + optional `OPENAI_BASE_URL` / `OPENAI_MODEL`.
  */
 export function getOpenAICompatConfigFromEnv(): OpenAICompatConfig | null {
-  const zgUrl =
-    process.env.ZG_COMPUTE_PROXY_URL?.trim() ||
-    process.env.ZG_PROXY_BASE_URL?.trim();
+  const zgUrl = process.env.ZG_COMPUTE_PROXY_URL?.trim();
   const zgSecret =
     process.env.ZG_COMPUTE_SECRET?.trim() ||
     process.env.ZG_COMPUTE_API_KEY?.trim() ||

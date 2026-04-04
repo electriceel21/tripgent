@@ -14,7 +14,7 @@ import {
 import { dynamicClient } from "../lib/dynamicClient";
 
 const API_BASE =
-  process.env.EXPO_PUBLIC_TRIPGENT_API_URL ?? "http://127.0.0.1:8787";
+  process.env.EXPO_PUBLIC_TRIPGENT_API_URL ?? "http://127.0.0.1:3000";
 const API_BEARER_FALLBACK = process.env.EXPO_PUBLIC_API_AUTH_BEARER;
 
 /**

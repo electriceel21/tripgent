@@ -10,7 +10,3 @@ export type ChatMessage = {
 export type ChatRequest = {
   messages: ChatMessage[];
 };
-
-export type ChatResponse = {
-  message: ChatMessage;
-};

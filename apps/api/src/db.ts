@@ -1,7 +1,5 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
-export type TripgentSupabase = SupabaseClient;
-
 /**
  * Server-only client. Never expose SUPABASE_SERVICE_ROLE_KEY to browsers or mobile apps.
  */

@@ -3,14 +3,14 @@
 /**
  * Same-origin when unset (Next + Hono on one Vercel app). Override for a separate API server.
  */
-export function clientApiBase(): string {
+function clientApiBase(): string {
   const fromEnv = process.env.NEXT_PUBLIC_TRIPGENT_API_URL?.trim();
   if (fromEnv) return fromEnv;
   if (typeof window !== "undefined") return "";
   return "http://127.0.0.1:3000";
 }
 
-export function clientAdminHeaders(): HeadersInit {
+function clientAdminHeaders(): HeadersInit {
   const h: Record<string, string> = { "Content-Type": "application/json" };
   const k = process.env.NEXT_PUBLIC_ADMIN_API_KEY?.trim();
   if (k) h["x-admin-key"] = k;
