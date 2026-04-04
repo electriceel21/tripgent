@@ -1,9 +1,13 @@
 "use client";
 
+/**
+ * Same-origin when unset (Next + Hono on one Vercel app). Override for a separate API server.
+ */
 export function clientApiBase(): string {
-  return (
-    process.env.NEXT_PUBLIC_TRIPGENT_API_URL?.trim() || "http://127.0.0.1:8787"
-  );
+  const fromEnv = process.env.NEXT_PUBLIC_TRIPGENT_API_URL?.trim();
+  if (fromEnv) return fromEnv;
+  if (typeof window !== "undefined") return "";
+  return "http://127.0.0.1:3000";
 }
 
 export function clientAdminHeaders(): HeadersInit {

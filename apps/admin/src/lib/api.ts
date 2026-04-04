@@ -1,10 +1,12 @@
-/** Server-side only: base URL for Tripgent API (no NEXT_PUBLIC_ prefix). */
+/** Server-side: Tripgent API base (rewrites `/v1/*` on the same Next app when unset). */
 export function getApiBaseUrl(): string {
-  return (
-    process.env.TRIPGENT_API_URL?.trim() ||
-    process.env.NEXT_PUBLIC_TRIPGENT_API_URL?.trim() ||
-    "http://127.0.0.1:8787"
-  );
+  const explicit = process.env.TRIPGENT_API_URL?.trim();
+  if (explicit) return explicit;
+  const vercel = process.env.VERCEL_URL?.trim();
+  if (vercel) return `https://${vercel}`;
+  const pub = process.env.NEXT_PUBLIC_TRIPGENT_API_URL?.trim();
+  if (pub) return pub;
+  return "http://127.0.0.1:3000";
 }
 
 export function adminHeaders(): HeadersInit {

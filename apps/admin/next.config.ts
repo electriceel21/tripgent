@@ -8,6 +8,15 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   /** Monorepo: trace deps from tripgent root (avoids wrong React resolution). */
   outputFileTracingRoot: path.join(__dirname, "../.."),
+  transpilePackages: ["@tripgent/api"],
+  async rewrites() {
+    return {
+      beforeFiles: [
+        { source: "/health", destination: "/api/health" },
+        { source: "/v1/:path*", destination: "/api/v1/:path*" },
+      ],
+    };
+  },
 };
 
 export default nextConfig;

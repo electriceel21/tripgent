@@ -53,16 +53,17 @@ cp apps/mobile/.env.example apps/mobile/.env
 # EXPO_PUBLIC_* ; use your LAN IP for EXPO_PUBLIC_TRIPGENT_API_URL on a physical device
 ```
 
-Run API:
-
-```bash
-pnpm dev:api
-```
-
-Run **admin web app**:
+Run **admin + API together** (recommended — one origin, same as Vercel):
 
 ```bash
 pnpm dev:admin
+# http://127.0.0.1:3000/health , /v1/chat , /v1/admin/* (rewrites to /api/*)
+```
+
+Optional **standalone API** on port 8787 (e.g. mobile pointed at LAN IP):
+
+```bash
+pnpm dev:api
 ```
 
 Run **customer mobile chatbot** (dev client after prebuild):
@@ -85,10 +86,21 @@ pnpm dev:mobile
 
 **Auth:** If `API_AUTH_BEARER` is **unset**, the API accepts requests without a matching secret (fine for local dev). The mobile app sends **`Authorization: Bearer <Dynamic JWT>`** from `client.auth.token` when the user is signed in. For production, verify that JWT on the server (Dynamic docs) instead of relying on an open API.
 
+## Deploying to Vercel (admin + API in one project)
+
+The Hono app is mounted from **`@tripgent/api`** on **`apps/admin/src/app/api/[[...path]]/route.ts`**. Public URLs stay **`/health`** and **`/v1/*`** via Next **rewrites** to **`/api/*`**.
+
+1. Import the Git repo on [Vercel](https://vercel.com).
+2. Set **Root Directory** to **`apps/admin`**.
+3. **Environment variables** (Production / Preview): copy everything your API needs from **`apps/api/.env.example`** — at minimum **`SUPABASE_URL`**, **`SUPABASE_SERVICE_ROLE_KEY`**, plus chat keys (**`ZG_COMPUTE_*`** / **`OPENAI_*`** / **`RPC_URL`**, **`PRIVATE_KEY`**, **`PROVIDER_ADDRESS`**) as you use locally. Add **`ADMIN_API_KEY`**, **`API_AUTH_BEARER`**, **`CORS_ORIGINS`** (comma-separated; include your Expo / web origins when calling from a device) as needed.
+4. Vercel uses **`apps/admin/vercel.json`**: install from the monorepo root with pnpm, then builds **`@tripgent/api`** and **`@tripgent/admin`**.
+5. **Mobile:** set **`EXPO_PUBLIC_TRIPGENT_API_URL`** to `https://<your-deployment>.vercel.app` (no trailing slash). Paths are still **`/v1/chat`**, etc.
+6. **Function duration:** `route.ts` sets **`maxDuration = 300`** (requires Vercel Pro or higher for more than 10s). **Hobby** caps at **10s** — long LLM calls may time out unless you upgrade or use a faster model path.
+
 ## Next steps
 
 1. Verify **Dynamic JWT** on `POST /v1/chat` when you lock down the API.
 2. **Circle** buyer + seller flows for rewards ([nanopayments](https://developers.circle.com/gateway/nanopayments)).
-3. **Admin** UI: nav + CRUD in `apps/admin` — set **`NEXT_PUBLIC_TRIPGENT_API_URL`** and optional **`NEXT_PUBLIC_ADMIN_API_KEY`** for browser calls; server dashboard uses **`TRIPGENT_API_URL`** + **`ADMIN_API_KEY`**.
+3. **Admin UI** on Vercel uses the **same origin** by default (no **`NEXT_PUBLIC_TRIPGENT_API_URL`**). For a **separate** API host, set **`NEXT_PUBLIC_TRIPGENT_API_URL`** and server **`TRIPGENT_API_URL`**. Prefer **server-only** **`ADMIN_API_KEY`** (avoid exposing secrets with **`NEXT_PUBLIC_ADMIN_API_KEY`** on public URLs).
 
 0G skills: `.0g-skills/` (see `.cursor/rules/0g-skills-context.mdc`).
