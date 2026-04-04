@@ -83,10 +83,12 @@ pnpm dev:mobile
 - **`GET /v1/admin/sponsors/by-slug/:slug/tier-rates`** and **`GET /v1/admin/sponsors/:id/tier-rates`** — per-tier USDC rates (after migration **`002_air_monaco_mock.sql`**).
 - **`POST /v1/rewards/accrue`** — apply sponsor tier rate to pool spend (user + sponsor slug). **`GET /v1/rewards/accruals`** — ledger. Requires migration **`003_reward_accrual_usdc.sql`**. Auth: **`ADMIN_API_KEY`** (same as admin) or **`API_AUTH_BEARER`** (same as chat).
 - `GET /v1/users/profile?external_id=` — traveler tier, reputation, purchase history.
-- `POST /v1/chat` — **0G direct proxy:** set **`ZG_COMPUTE_PROXY_URL`** (e.g. `https://…/v1/proxy`) + **`ZG_COMPUTE_SECRET`** (`app-sk-…` from CLI) + optional **`ZG_COMPUTE_MODEL`** (default `qwen/qwen-2.5-7b-instruct`). Same URL + **`OPENAI_API_KEY`** holding `app-sk-…` also works. Otherwise **OpenAI-compatible** (`OPENAI_*` / `LLM_*`) or **0G broker** (`RPC_URL`, `PRIVATE_KEY`, `PROVIDER_ADDRESS`).
+- `POST /v1/chat` — **0G direct proxy:** set **`ZG_COMPUTE_PROXY_URL`** (e.g. `https://…/v1/proxy`) + **`ZG_COMPUTE_SECRET`** (`app-sk-…` from CLI) + optional **`ZG_COMPUTE_MODEL`** (default `qwen/qwen-2.5-7b-instruct`). Same URL + **`OPENAI_API_KEY`** holding `app-sk-…` also works. Otherwise **OpenAI-compatible** (`OPENAI_*` / `LLM_*`) or **0G broker** (`RPC_URL`, `PRIVATE_KEY`, `PROVIDER_ADDRESS`). Optional JSON: **`destination_slug`: `"monaco"`** (loads Monaco mock context from DB after migration **`004_monaco_destination_mocks.sql`**), **`user_external_id`** + optional **`display_name`** — on success, accrues a micro-reward from the **Air Monaco** pool per completed reply (**reason** `monaco_search`; requires **`003`** + tier rates in **`002`**).
 - `GET /v1/payments/status` — Circle nanopayments stub.
 
 **Tests:** `pnpm --filter @tripgent/api test` runs tier math always; full DB flow runs only if Supabase env vars are set.
+
+**Admin dashboard all zeros after SQL?** The API must use **`SUPABASE_SERVICE_ROLE_KEY` = service_role** (Supabase → Project Settings → API), not the **anon** key — with RLS and no policies for `anon`, selects return no rows. Confirm the **Supabase host** on the admin home matches the project where you ran SQL; run `apps/api/supabase/VERIFY_COUNTS.sql` in that project’s SQL editor to compare counts.
 
 **Auth:** If `API_AUTH_BEARER` is **unset**, the API accepts requests without a matching secret (fine for local dev). The mobile app sends **`Authorization: Bearer <Dynamic JWT>`** from `client.auth.token` when the user is signed in. For production, verify that JWT on the server (Dynamic docs) instead of relying on an open API.
 
@@ -100,11 +102,12 @@ The Hono app is mounted from **`@tripgent/api`** on **`apps/admin/src/app/api/[[
 4. Vercel uses **`apps/admin/vercel.json`**: install from the monorepo root with pnpm, then builds **`@tripgent/api`** and **`@tripgent/admin`**.
 5. **Mobile:** set **`EXPO_PUBLIC_TRIPGENT_API_URL`** to `https://<your-deployment>.vercel.app` (no trailing slash). Paths are still **`/v1/chat`**, etc.
 6. **Function duration:** `route.ts` sets **`maxDuration = 300`** (requires Vercel Pro or higher for more than 10s). **Hobby** caps at **10s** — long LLM calls may time out unless you upgrade or use a faster model path.
+7. **Deployment Protection:** If **`/health`** or the admin dashboard shows **401** and **HTML** (“Authentication Required”), Vercel is gating the whole deployment — not Tripgent. Either **turn off** protection for Preview/Production (Project → Settings → Deployment Protection), or enable **[Protection Bypass for Automation](https://vercel.com/docs/deployment-protection/methods-to-bypass-deployment-protection/protection-bypass-automation)** so **`VERCEL_AUTOMATION_BYPASS_SECRET`** is set and server-side checks can reach your API.
 
 ## Next steps
 
 1. Verify **Dynamic JWT** on `POST /v1/chat` when you lock down the API.
-2. **Circle** buyer + seller flows for rewards ([nanopayments](https://developers.circle.com/gateway/nanopayments)).
+2. **Circle:** fund a **Developer-Controlled** treasury wallet, deposit into **Gateway** on Arc testnet, then enable env vars so **`reward_wallet_address`** receives mints after accrual ([unified balance EVM](https://developers.circle.com/gateway/quickstarts/unified-balance-evm)); use [nanopayments](https://developers.circle.com/gateway/nanopayments) only if you charge travelers per request (x402).
 3. **Admin UI** on Vercel uses the **same origin** by default (no **`NEXT_PUBLIC_TRIPGENT_API_URL`**). For a **separate** API host, set **`NEXT_PUBLIC_TRIPGENT_API_URL`** and server **`TRIPGENT_API_URL`**. Prefer **server-only** **`ADMIN_API_KEY`** (avoid exposing secrets with **`NEXT_PUBLIC_ADMIN_API_KEY`** on public URLs).
 
 0G skills: `.0g-skills/` (see `.cursor/rules/0g-skills-context.mdc`).

@@ -1,6 +1,6 @@
 import { Hono, type Context } from "hono";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { ensureUser } from "./users-repo.js";
+import { accrueSponsorTierReward } from "./accrue-reward.js";
 
 /** Admin key OR traveler API_AUTH_BEARER (same as /v1/chat). */
 function rewardsAuthOk(c: Context): boolean {
@@ -17,21 +17,6 @@ function rewardsAuthOk(c: Context): boolean {
   const auth = c.req.header("authorization") ?? "";
   const token = auth.startsWith("Bearer ") ? auth.slice(7) : "";
   return token === expected;
-}
-
-type PoolRow = {
-  id: number;
-  name?: string | null;
-  budget_cents: number;
-  spent_cents: number;
-  budget_usdc: string | number | null;
-  spent_usdc: string | number | null;
-  active: boolean;
-};
-
-function num(v: string | number | null | undefined): number {
-  if (v == null) return 0;
-  return typeof v === "number" ? v : Number(v);
 }
 
 export function createRewardsApp(sb: SupabaseClient): Hono {
@@ -51,6 +36,7 @@ export function createRewardsApp(sb: SupabaseClient): Hono {
       sponsor_slug?: string;
       units?: number;
       display_name?: string;
+      reason?: string;
     };
     if (!body.user_external_id?.trim() || !body.sponsor_slug?.trim()) {
       return c.json(
@@ -58,129 +44,38 @@ export function createRewardsApp(sb: SupabaseClient): Hono {
         400
       );
     }
-    const units = body.units != null && Number(body.units) > 0 ? Number(body.units) : 1;
 
-    let userId: number;
-    try {
-      userId = await ensureUser(
-        sb,
-        body.user_external_id.trim(),
-        body.display_name
-      );
-    } catch (e) {
-      return c.json(
-        { error: e instanceof Error ? e.message : "user error" },
-        500
-      );
-    }
-
-    const { data: user, error: ue } = await sb
-      .from("users")
-      .select("id, tier")
-      .eq("id", userId)
-      .single();
-    if (ue || !user) return c.json({ error: "user not found" }, 500);
-    const tier = String(user.tier);
-
-    const { data: sponsor, error: se } = await sb
-      .from("sponsors")
-      .select("id")
-      .eq("slug", body.sponsor_slug.trim().toLowerCase())
-      .maybeSingle();
-    if (se) return c.json({ error: se.message }, 500);
-    if (!sponsor?.id) return c.json({ error: "sponsor not found" }, 404);
-
-    const { data: rateRow, error: re } = await sb
-      .from("sponsor_tier_rates")
-      .select("rate_usdc")
-      .eq("sponsor_id", sponsor.id)
-      .eq("tier", tier)
-      .maybeSingle();
-    if (re) return c.json({ error: re.message }, 500);
-    if (!rateRow?.rate_usdc) {
-      return c.json(
-        { error: `no tier rate for sponsor + tier (${tier})` },
-        404
-      );
-    }
-    const rate = num(rateRow.rate_usdc as number | string);
-    const amountUsdc = rate * units;
-
-    const { data: pools, error: pe } = await sb
-      .from("reward_pools")
-      .select("*")
-      .eq("sponsor_id", sponsor.id)
-      .eq("active", true)
-      .order("id", { ascending: true });
-    if (pe) return c.json({ error: pe.message }, 500);
-    const list = (pools ?? []) as PoolRow[];
-    const pool =
-      list.find((p) => /reward/i.test(String(p.name ?? ""))) ?? list[0];
-    if (!pool) return c.json({ error: "no active reward pool for sponsor" }, 404);
-
-    const budgetUsdc =
-      pool.budget_usdc != null
-        ? num(pool.budget_usdc)
-        : num(pool.budget_cents) / 100;
-    let spentUsdc =
-      pool.spent_usdc != null
-        ? num(pool.spent_usdc)
-        : num(pool.spent_cents) / 100;
-
-    if (spentUsdc + amountUsdc > budgetUsdc + 1e-12) {
-      return c.json(
-        {
-          error: "pool budget exceeded",
-          budget_usdc: budgetUsdc,
-          spent_usdc: spentUsdc,
-          requested_usdc: amountUsdc,
-        },
-        400
-      );
-    }
-
-    spentUsdc += amountUsdc;
-    const spentCents = Math.ceil(spentUsdc * 100);
-
-    const { error: insErr } = await sb.from("reward_accruals").insert({
-      user_id: userId,
-      sponsor_id: sponsor.id,
-      pool_id: pool.id,
-      tier,
-      units,
-      rate_usdc: rate,
-      amount_usdc: amountUsdc,
-      reason: "tier_rate",
+    const result = await accrueSponsorTierReward(sb, {
+      userExternalId: body.user_external_id.trim(),
+      sponsorSlug: body.sponsor_slug.trim(),
+      units: body.units,
+      displayName: body.display_name,
+      reason: body.reason,
     });
-    if (insErr) {
-      if (insErr.message.includes("does not exist")) {
-        return c.json(
-          { error: "Run migration 003_reward_accrual_usdc.sql in Supabase" },
-          503
-        );
-      }
-      return c.json({ error: insErr.message }, 500);
-    }
 
-    const { error: upErr } = await sb
-      .from("reward_pools")
-      .update({
-        spent_usdc: spentUsdc,
-        spent_cents: spentCents,
-      })
-      .eq("id", pool.id);
-    if (upErr) return c.json({ error: upErr.message }, 500);
+    if (!result.ok) {
+      if (result.code === "budget") {
+        return c.json({ error: result.error }, 400);
+      }
+      if (result.code === "migration") {
+        return c.json({ error: result.error }, 503);
+      }
+      if (result.code === "sponsor" || result.code === "rate") {
+        return c.json({ error: result.error }, 404);
+      }
+      return c.json({ error: result.error }, 500);
+    }
 
     return c.json({
       ok: true,
-      user_external_id: body.user_external_id.trim(),
-      tier,
-      rate_usdc: rate,
-      units,
-      amount_usdc: amountUsdc,
-      pool_id: pool.id,
-      spent_usdc: spentUsdc,
-      budget_usdc: budgetUsdc,
+      user_external_id: result.user_external_id,
+      tier: result.tier,
+      rate_usdc: result.rate_usdc,
+      units: result.units,
+      amount_usdc: result.amount_usdc,
+      pool_id: result.pool_id,
+      spent_usdc: result.spent_usdc,
+      budget_usdc: result.budget_usdc,
     });
   });
 
@@ -188,7 +83,7 @@ export function createRewardsApp(sb: SupabaseClient): Hono {
     const { data, error } = await sb
       .from("reward_accruals")
       .select(
-        "id, tier, units, rate_usdc, amount_usdc, created_at, users(external_id), sponsors(name, slug)"
+        "id, tier, units, rate_usdc, amount_usdc, reason, created_at, users(external_id), sponsors(name, slug)"
       )
       .order("id", { ascending: false })
       .limit(200);

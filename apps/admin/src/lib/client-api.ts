@@ -23,8 +23,19 @@ export async function clientFetch<T>(
 ): Promise<{ ok: boolean; data?: T; error?: string; status: number }> {
   const base = clientApiBase();
   try {
-    const res = await fetch(`${base}${path}`, {
+    const url = `${base}${path}`;
+    const sameSite =
+      typeof window !== "undefined" &&
+      (() => {
+        try {
+          return new URL(url, window.location.href).origin === window.location.origin;
+        } catch {
+          return false;
+        }
+      })();
+    const res = await fetch(url, {
       ...init,
+      credentials: sameSite ? "include" : "same-origin",
       headers: { ...clientAdminHeaders(), ...(init?.headers as object) },
     });
     const text = await res.text();

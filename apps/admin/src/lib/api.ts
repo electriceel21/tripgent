@@ -15,5 +15,8 @@ export function adminHeaders(): HeadersInit {
     process.env.ADMIN_API_KEY?.trim() ||
     process.env.NEXT_PUBLIC_ADMIN_API_KEY?.trim();
   if (key) h["x-admin-key"] = key;
+  /** Server-side fetch to own Vercel URL when Deployment Protection is on (not for browsers). */
+  const bypass = process.env.VERCEL_AUTOMATION_BYPASS_SECRET?.trim();
+  if (bypass) h["x-vercel-protection-bypass"] = bypass;
   return h;
 }

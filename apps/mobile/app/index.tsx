@@ -17,12 +17,46 @@ const API_BASE =
   process.env.EXPO_PUBLIC_TRIPGENT_API_URL ?? "http://127.0.0.1:3000";
 const API_BEARER_FALLBACK = process.env.EXPO_PUBLIC_API_AUTH_BEARER;
 
+function externalUserIdFromDynamic(client: unknown): string | undefined {
+  if (!client || typeof client !== "object") return undefined;
+  const c = client as Record<string, unknown>;
+  const auth = c.auth as Record<string, unknown> | undefined;
+  const au = auth?.authenticatedUser as Record<string, unknown> | undefined;
+  const id = au?.userId ?? au?.user_id;
+  if (typeof id === "string" && id.trim()) return id.trim();
+  const u = c.user as Record<string, unknown> | undefined;
+  const uid = u?.userId ?? u?.id;
+  if (typeof uid === "string" && uid.trim()) return uid.trim();
+  return undefined;
+}
+
+/** First authenticated EVM-looking address (Circle Gateway mint on Arc testnet). */
+function rewardWalletAddressFromDynamic(client: unknown): string | undefined {
+  if (!client || typeof client !== "object") return undefined;
+  const wallets = (client as { wallets?: { userWallets?: { address?: string; isAuthenticated?: boolean }[] } }).wallets?.userWallets;
+  if (!Array.isArray(wallets)) return undefined;
+  const pick = (w: { address?: string; isAuthenticated?: boolean }) => {
+    const a = typeof w.address === "string" ? w.address.trim() : "";
+    if (!/^0x[a-fA-F0-9]{40}$/.test(a)) return undefined;
+    return a;
+  };
+  const authed = wallets.filter((w) => w.isAuthenticated);
+  for (const w of authed.length ? authed : wallets) {
+    const a = pick(w);
+    if (a) return a;
+  }
+  return undefined;
+}
+
 /**
  * Customer-facing travel agent (0G compute via API). Auth: Dynamic embedded wallet + JWT on `client.auth.token`.
+ * Monaco focus + pool accrual when signed in (passes `user_external_id`).
  */
 export default function ChatScreen() {
   const client = useReactiveClient(dynamicClient);
   const authToken = client.auth.token;
+  const externalUserId = externalUserIdFromDynamic(client);
+  const rewardWalletAddress = rewardWalletAddressFromDynamic(client);
 
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<
@@ -50,18 +84,28 @@ export default function ChatScreen() {
       const bearer = authToken ?? API_BEARER_FALLBACK;
       if (bearer) headers.Authorization = `Bearer ${bearer}`;
 
+      const chatBody: Record<string, unknown> = {
+        messages: [...messages, nextUser].map(({ role, content }) => ({
+          role,
+          content,
+        })),
+        destination_slug: "monaco",
+      };
+      if (externalUserId) {
+        chatBody.user_external_id = externalUserId;
+      }
+      if (rewardWalletAddress) {
+        chatBody.reward_wallet_address = rewardWalletAddress;
+      }
+
       const res = await fetch(`${API_BASE}/v1/chat`, {
         method: "POST",
         headers,
-        body: JSON.stringify({
-          messages: [...messages, nextUser].map(({ role, content }) => ({
-            role,
-            content,
-          })),
-        }),
+        body: JSON.stringify(chatBody),
       });
       const data = (await res.json()) as {
         message?: { content: string };
+        reward?: { accrued_usdc?: number; skipped?: string };
         error?: string;
       };
       if (!res.ok) {
@@ -80,7 +124,14 @@ export default function ChatScreen() {
     } finally {
       setLoading(false);
     }
-  }, [authToken, input, loading, messages]);
+  }, [
+    authToken,
+    externalUserId,
+    rewardWalletAddress,
+    input,
+    loading,
+    messages,
+  ]);
 
   return (
     <KeyboardAvoidingView
@@ -90,12 +141,23 @@ export default function ChatScreen() {
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
         <Text style={styles.title}>Tripgent</Text>
         <Text style={styles.sub}>
-          Your travel concierge · rewards with Circle Gateway / ARC (nanopayments on the roadmap)
+          Your travel concierge · Monaco pool accrual + optional Circle Gateway USDC mint to your wallet
         </Text>
 
         <View style={styles.authRow}>
           {authToken ? (
-            <Text style={styles.authed}>Signed in</Text>
+            <View>
+              <Text style={styles.authed}>Signed in</Text>
+              {rewardWalletAddress ? (
+                <Text style={styles.walletHint} numberOfLines={1}>
+                  Wallet {rewardWalletAddress.slice(0, 6)}…{rewardWalletAddress.slice(-4)}
+                </Text>
+              ) : (
+                <Text style={styles.walletHint}>
+                  No EVM wallet in session yet — complete Dynamic onboarding
+                </Text>
+              )}
+            </View>
           ) : (
             <Pressable style={styles.signInBtn} onPress={openSignIn}>
               <Text style={styles.signInText}>Sign in</Text>
@@ -105,8 +167,9 @@ export default function ChatScreen() {
 
         {messages.length === 0 && (
           <Text style={styles.hint}>
-            Ask about neighborhoods, day trips, or food. Inference runs on 0G via the Tripgent API.
-            Leave API_AUTH_BEARER unset on the API until you verify Dynamic JWTs in production.
+            Ask about Monaco—restaurants, hotels, things to do, shopping, and activities. Inference
+            runs via the Tripgent API; signed-in users accrue micro-rewards from the Air Monaco pool
+            per search (when migrations 002–004 and 003 are applied).
           </Text>
         )}
         {messages.map((m, i) => (
@@ -157,6 +220,7 @@ const styles = StyleSheet.create({
   sub: { color: "#8b949e", marginBottom: 12, fontSize: 14, lineHeight: 20 },
   authRow: { marginBottom: 16 },
   authed: { color: "#3fb950", fontSize: 14, fontWeight: "600" },
+  walletHint: { color: "#8b949e", fontSize: 12, marginTop: 4, fontFamily: Platform.OS === "ios" ? "Menlo" : "monospace" },
   signInBtn: {
     alignSelf: "flex-start",
     backgroundColor: "#1f6feb",

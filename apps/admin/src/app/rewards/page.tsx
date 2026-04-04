@@ -11,6 +11,7 @@ type AccrualRow = {
   units: number;
   rate_usdc: number | string;
   amount_usdc: number | string;
+  reason?: string | null;
   created_at: string;
   users?: { external_id?: string } | null;
   sponsors?: { name?: string; slug?: string } | null;
@@ -126,6 +127,7 @@ export default function RewardsPage() {
                 <th style={th}>Units</th>
                 <th style={th}>Rate</th>
                 <th style={th}>Amount</th>
+                <th style={th}>Reason</th>
                 <th style={th}>When</th>
               </tr>
             </thead>
@@ -143,6 +145,9 @@ export default function RewardsPage() {
                   <td style={td}>{a.units}</td>
                   <td style={td}>{String(a.rate_usdc)}</td>
                   <td style={td}>{String(a.amount_usdc)}</td>
+                  <td style={td}>
+                    <code style={{ fontSize: "0.75rem" }}>{a.reason ?? "—"}</code>
+                  </td>
                   <td style={td}>{new Date(a.created_at).toLocaleString()}</td>
                 </tr>
               ))}

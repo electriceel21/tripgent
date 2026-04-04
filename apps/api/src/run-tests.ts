@@ -35,34 +35,49 @@ const app = new Hono();
 app.route("/v1/admin", createAdminApp(sb));
 app.get("/v1/users/profile", getUserProfileHandler(sb));
 
+function adminTestHeaders(): HeadersInit {
+  const h: Record<string, string> = { "Content-Type": "application/json" };
+  const key = process.env.ADMIN_API_KEY?.trim();
+  if (key) h["x-admin-key"] = key;
+  return h;
+}
+
 async function post(path: string, body: unknown) {
   return app.fetch(
     new Request(`http://t${path}`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: adminTestHeaders(),
       body: JSON.stringify(body),
     })
   );
+}
+
+async function assertStatusJson<T>(res: Response, status: number): Promise<T> {
+  const text = await res.text();
+  assert.equal(res.status, status, text);
+  return JSON.parse(text) as T;
 }
 
 async function patch(path: string, body: unknown) {
   return app.fetch(
     new Request(`http://t${path}`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
+      headers: adminTestHeaders(),
       body: JSON.stringify(body),
     })
   );
 }
 
 async function get(path: string) {
-  return app.fetch(new Request(`http://t${path}`));
+  const key = process.env.ADMIN_API_KEY?.trim();
+  const h: Record<string, string> = {};
+  if (key) h["x-admin-key"] = key;
+  return app.fetch(new Request(`http://t${path}`, { headers: h }));
 }
 
 const suffix = `-${Date.now()}`;
 let res = await post("/v1/admin/sponsors", { name: "Test Air", slug: `test-air${suffix}` });
-assert.equal(res.status, 201, await res.text());
-const sponsor = (await res.json()) as { id: number };
+const sponsor = await assertStatusJson<{ id: number }>(res, 201);
 
 res = await post("/v1/admin/locations", {
   sponsor_id: sponsor.id,
@@ -70,8 +85,7 @@ res = await post("/v1/admin/locations", {
   slug: `lisbon${suffix}`,
   country: "PT",
 });
-assert.equal(res.status, 201, await res.text());
-const loc = (await res.json()) as { id: number };
+const loc = await assertStatusJson<{ id: number }>(res, 201);
 
 res = await post("/v1/admin/pools", {
   sponsor_id: sponsor.id,
@@ -79,8 +93,7 @@ res = await post("/v1/admin/pools", {
   name: "Lisbon rewards",
   budget_usd: 100,
 });
-assert.equal(res.status, 201, await res.text());
-const pool = (await res.json()) as { id: number; budget_cents: number };
+const pool = await assertStatusJson<{ id: number; budget_cents: number }>(res, 201);
 assert.equal(pool.budget_cents, 10000);
 
 res = await post("/v1/admin/offers", {
@@ -91,8 +104,7 @@ res = await post("/v1/admin/offers", {
   reward_usd: 2.5,
   purchase_url: "https://example.com/buy",
 });
-assert.equal(res.status, 201, await res.text());
-const offer = (await res.json()) as { id: number; reward_cents: number };
+const offer = await assertStatusJson<{ id: number; reward_cents: number }>(res, 201);
 assert.equal(offer.reward_cents, 250);
 
 const extId = `dynamic-user-${suffix}`;
@@ -102,12 +114,11 @@ res = await post("/v1/admin/purchases", {
   offer_id: offer.id,
   status: "confirmed",
 });
-assert.equal(res.status, 201, await res.text());
-const purchase = (await res.json()) as {
+const purchase = await assertStatusJson<{
   tier: string;
   reputation_score: number;
   purchases_confirmed: number;
-};
+}>(res, 201);
 assert.equal(purchase.purchases_confirmed, 1);
 assert.equal(purchase.tier, "silver");
 assert.ok(purchase.reputation_score >= 10);
@@ -121,8 +132,7 @@ res = await post("/v1/admin/purchases", {
   offer_id: offer.id,
   status: "pending",
 });
-assert.equal(res.status, 201, await res.text());
-const p2 = (await res.json()) as { id: number };
+const p2 = await assertStatusJson<{ id: number }>(res, 201);
 res = await patch(`/v1/admin/purchases/${p2.id}`, { status: "confirmed" });
 assert.equal(res.status, 200);
 
