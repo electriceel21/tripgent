@@ -462,20 +462,40 @@ export function createAdminApp(sb: SupabaseClient): Hono {
     if (offer.pool_id != null) {
       const { data: pool, error: pe } = await sb
         .from("reward_pools")
-        .select("budget_cents, spent_cents")
+        .select("budget_cents, spent_cents, budget_usdc, spent_usdc")
         .eq("id", offer.pool_id)
         .maybeSingle();
       if (pe) return { error: pe.message };
       if (pool) {
-        const nextSpent = Number(pool.spent_cents) + Number(offer.reward_cents);
-        if (nextSpent > Number(pool.budget_cents)) {
+        const rewardCents = Number(offer.reward_cents);
+        const nextSpentCents = Number(pool.spent_cents) + rewardCents;
+        const budgetCents = Number(pool.budget_cents);
+        const budgetUsd =
+          pool.budget_usdc != null && String(pool.budget_usdc) !== ""
+            ? Number(pool.budget_usdc)
+            : budgetCents / 100;
+        const spentUsdBefore =
+          pool.spent_usdc != null && String(pool.spent_usdc) !== ""
+            ? Number(pool.spent_usdc)
+            : Number(pool.spent_cents) / 100;
+        const rewardUsd = rewardCents / 100;
+        const nextSpentUsd = spentUsdBefore + rewardUsd;
+        if (nextSpentUsd > budgetUsd + 1e-9) {
           return {
-            error: `Pool ${offer.pool_id} would exceed budget (spent ${nextSpent} > budget ${pool.budget_cents} cents)`,
+            error: `Pool ${offer.pool_id} would exceed budget (${nextSpentUsd} > ${budgetUsd} USDC)`,
+          };
+        }
+        if (nextSpentCents > budgetCents) {
+          return {
+            error: `Pool ${offer.pool_id} would exceed budget (${nextSpentCents} > ${budgetCents} cents)`,
           };
         }
         const { error: se } = await sb
           .from("reward_pools")
-          .update({ spent_cents: nextSpent })
+          .update({
+            spent_cents: nextSpentCents,
+            spent_usdc: nextSpentUsd,
+          })
           .eq("id", offer.pool_id);
         if (se) return { error: se.message };
       }

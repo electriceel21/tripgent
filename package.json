@@ -2,6 +2,12 @@
   "name": "tripgent",
   "private": true,
   "packageManager": "pnpm@9.15.0",
+  "pnpm": {
+    "overrides": {
+      "react": "18.3.1",
+      "react-dom": "18.3.1"
+    }
+  },
   "scripts": {
     "dev:api": "pnpm --filter @tripgent/api dev",
     "dev:admin": "pnpm --filter @tripgent/admin dev",

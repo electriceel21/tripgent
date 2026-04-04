@@ -76,6 +76,7 @@ pnpm dev:mobile
 
 - **`/v1/admin/*`** — CRUD for sponsors, locations, reward pools, offers, purchases; dashboard counts. Uses **Supabase** via `SUPABASE_SERVICE_ROLE_KEY`. Set **`ADMIN_API_KEY`** and send `x-admin-key` (or `Authorization: Bearer`) in production.
 - **`GET /v1/admin/sponsors/by-slug/:slug/tier-rates`** and **`GET /v1/admin/sponsors/:id/tier-rates`** — per-tier USDC rates (after migration **`002_air_monaco_mock.sql`**).
+- **`POST /v1/rewards/accrue`** — apply sponsor tier rate to pool spend (user + sponsor slug). **`GET /v1/rewards/accruals`** — ledger. Requires migration **`003_reward_accrual_usdc.sql`**. Auth: **`ADMIN_API_KEY`** (same as admin) or **`API_AUTH_BEARER`** (same as chat).
 - `GET /v1/users/profile?external_id=` — traveler tier, reputation, purchase history.
 - `POST /v1/chat` — **0G direct proxy:** set **`ZG_COMPUTE_PROXY_URL`** (e.g. `https://…/v1/proxy`) + **`ZG_COMPUTE_SECRET`** (`app-sk-…` from CLI) + optional **`ZG_COMPUTE_MODEL`** (default `qwen/qwen-2.5-7b-instruct`). Same URL + **`OPENAI_API_KEY`** holding `app-sk-…` also works. Otherwise **OpenAI-compatible** (`OPENAI_*` / `LLM_*`) or **0G broker** (`RPC_URL`, `PRIVATE_KEY`, `PROVIDER_ADDRESS`).
 - `GET /v1/payments/status` — Circle nanopayments stub.
@@ -88,6 +89,6 @@ pnpm dev:mobile
 
 1. Verify **Dynamic JWT** on `POST /v1/chat` when you lock down the API.
 2. **Circle** buyer + seller flows for rewards ([nanopayments](https://developers.circle.com/gateway/nanopayments)).
-3. **Admin** UI wired to `/v1/admin` (see `apps/admin` env for API URL + admin key).
+3. **Admin** UI: nav + CRUD in `apps/admin` — set **`NEXT_PUBLIC_TRIPGENT_API_URL`** and optional **`NEXT_PUBLIC_ADMIN_API_KEY`** for browser calls; server dashboard uses **`TRIPGENT_API_URL`** + **`ADMIN_API_KEY`**.
 
 0G skills: `.0g-skills/` (see `.cursor/rules/0g-skills-context.mdc`).

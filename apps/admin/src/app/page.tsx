@@ -115,15 +115,17 @@ export default async function AdminHome() {
         }}
       >
         <h2 style={{ fontSize: "1rem", margin: "0 0 0.75rem" }}>Modules</h2>
-        <ul style={{ margin: 0, paddingLeft: "1.25rem", color: "var(--muted)" }}>
-          <li>Sponsors, locations, pools, offers — use API or Supabase Table Editor for now</li>
-          <li>Customer app: <code style={{ color: "var(--accent)" }}>apps/mobile</code></li>
-        </ul>
+        <p style={{ margin: 0, color: "var(--muted)", fontSize: "0.95rem" }}>
+          Use the top nav: Sponsors, Locations, Pools, Offers, Users, Purchases, Rewards. For the
+          traveler app see <code style={{ color: "var(--accent)" }}>apps/mobile</code>.
+        </p>
       </section>
 
       <p style={{ fontSize: "0.85rem", color: "var(--muted)" }}>
-        Configure <code>TRIPGENT_API_URL</code> and optional <code>ADMIN_API_KEY</code> in{" "}
-        <code>apps/admin/.env.local</code>.
+        Server-side: <code>TRIPGENT_API_URL</code>, <code>ADMIN_API_KEY</code> in{" "}
+        <code>.env.local</code>. Client forms also need{" "}
+        <code>NEXT_PUBLIC_TRIPGENT_API_URL</code> and optional{" "}
+        <code>NEXT_PUBLIC_ADMIN_API_KEY</code>.
       </p>
     </main>
   );

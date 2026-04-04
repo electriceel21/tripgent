@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { AdminNav } from "@/components/AdminNav";
 import "./globals.css";
 
 export const dynamic = "force-dynamic";
@@ -15,7 +16,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <AdminNav />
+        {children}
+      </body>
     </html>
   );
 }

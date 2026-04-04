@@ -5,6 +5,7 @@ import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import type { ChatRequest } from "@tripgent/shared";
 import { createAdminApp, getUserProfileHandler } from "./admin-routes.js";
+import { createRewardsApp } from "./rewards-routes.js";
 import { createServiceClient } from "./db.js";
 import {
   getOpenAICompatConfigFromEnv,
@@ -59,6 +60,7 @@ const TRAVEL_SYSTEM = `You are Tripgent, a concise AI travel concierge. You give
 app.get("/health", (c) => c.json({ ok: true }));
 
 app.route("/v1/admin", createAdminApp(supabase));
+app.route("/v1/rewards", createRewardsApp(supabase));
 app.get("/v1/users/profile", getUserProfileHandler(supabase));
 
 app.post("/v1/chat", async (c) => {

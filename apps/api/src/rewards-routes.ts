@@ -2,8 +2,9 @@ import { Hono, type Context } from "hono";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { ensureUser } from "./users-repo.js";
 
-function adminOrChatAuthOk(c: Context): boolean {
-  const adminKey = process.env.ADMIN_API_KEY;
+/** Admin key OR traveler API_AUTH_BEARER (same as /v1/chat). */
+function rewardsAuthOk(c: Context): boolean {
+  const adminKey = process.env.ADMIN_API_KEY?.trim();
   if (adminKey) {
     const xh = c.req.header("x-admin-key");
     if (xh === adminKey) return true;
@@ -11,7 +12,7 @@ function adminOrChatAuthOk(c: Context): boolean {
     const t = auth.startsWith("Bearer ") ? auth.slice(7) : "";
     if (t === adminKey) return true;
   }
-  const expected = process.env.API_AUTH_BEARER;
+  const expected = process.env.API_AUTH_BEARER?.trim();
   if (!expected) return true;
   const auth = c.req.header("authorization") ?? "";
   const token = auth.startsWith("Bearer ") ? auth.slice(7) : "";
@@ -20,6 +21,7 @@ function adminOrChatAuthOk(c: Context): boolean {
 
 type PoolRow = {
   id: number;
+  name?: string | null;
   budget_cents: number;
   spent_cents: number;
   budget_usdc: string | number | null;
@@ -36,7 +38,7 @@ export function createRewardsApp(sb: SupabaseClient): Hono {
   const app = new Hono();
 
   app.use("*", async (c, next) => {
-    if (!adminOrChatAuthOk(c)) {
+    if (!rewardsAuthOk(c)) {
       return c.json({ error: "Unauthorized" }, 401);
     }
     await next();
