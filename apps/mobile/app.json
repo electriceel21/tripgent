@@ -1,0 +1,25 @@
+{
+  "expo": {
+    "name": "Tripgent",
+    "slug": "tripgent",
+    "scheme": "tripgent",
+    "version": "0.0.1",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "ai.tripgent.app"
+    },
+    "android": {
+      "package": "ai.tripgent.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#0c0f14"
+      }
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store"
+    ]
+  }
+}

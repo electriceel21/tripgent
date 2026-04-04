@@ -1,0 +1,16 @@
+{
+  "name": "tripgent",
+  "private": true,
+  "packageManager": "pnpm@9.15.0",
+  "scripts": {
+    "dev:api": "pnpm --filter @tripgent/api dev",
+    "dev:admin": "pnpm --filter @tripgent/admin dev",
+    "dev:mobile": "pnpm --filter @tripgent/mobile start",
+    "dev:customer": "pnpm dev:mobile",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
