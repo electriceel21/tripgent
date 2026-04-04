@@ -1,0 +1,16 @@
+---
+description: Reference all skill files in the .0g-skills directory for AI context
+globs:
+  - "**/*"
+alwaysApply: true
+---
+
+# Project Skills Context
+
+Always use the material under `.0g-skills/` when answering questions or generating code for this project.
+
+1. **Start with orchestration**: Read `.0g-skills/AGENTS.md` for skill index, triggers, workflow sequences, and critical rules.
+2. **Load focused skills**: When a task matches a domain (storage, compute, chain, cross-layer), open and follow the relevant `SKILL.md` under `.0g-skills/skills/` rather than guessing APIs or flows.
+3. **Patterns**: Use `.0g-skills/patterns/` for endpoints, chain IDs, storage, compute, and EVM conventions.
+
+@.0g-skills
