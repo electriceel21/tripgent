@@ -6,10 +6,12 @@ import {
   btnStyle,
   dangerBtn,
   inputStyle,
+  labelStyle,
   main,
+  pageHeading,
+  pageSub,
   section,
-  td,
-  th,
+  sectionTitle,
 } from "@/lib/admin-page-styles";
 import { clientFetch } from "@/lib/client-api";
 
@@ -120,7 +122,7 @@ export default function LocationsPage() {
               ))}
             </select>
           </label>
-          <label style={{ display: "grid", gap: 4, fontSize: "0.85rem" }}>
+          <label style={labelStyle}>
             Name
             <input
               value={name}
@@ -133,7 +135,7 @@ export default function LocationsPage() {
             Slug (optional)
             <input value={slug} onChange={(e) => setSlug(e.target.value)} style={inputStyle} />
           </label>
-          <label style={{ display: "grid", gap: 4, fontSize: "0.85rem" }}>
+          <label style={labelStyle}>
             Country (optional)
             <input value={country} onChange={(e) => setCountry(e.target.value)} style={inputStyle} />
           </label>
@@ -143,37 +145,35 @@ export default function LocationsPage() {
         </form>
       </section>
 
-      {msg ? (
-        <p style={{ color: "#f85149", marginBottom: "1rem" }}>{msg}</p>
-      ) : null}
+      {msg ? <p className="admin-msg-error">{msg}</p> : null}
 
       <section style={section}>
-        <h2 style={{ fontSize: "1rem", marginTop: 0 }}>
+        <h2 style={sectionTitle}>
           All locations {loading ? "(loading…)" : `(${locations.length})`}
         </h2>
         <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.9rem" }}>
+          <table className="admin-table">
             <thead>
-              <tr style={{ textAlign: "left", color: "var(--muted)" }}>
-                <th style={th}>ID</th>
-                <th style={th}>Name</th>
-                <th style={th}>Slug</th>
-                <th style={th}>Sponsor</th>
-                <th style={th}>Country</th>
-                <th style={th} />
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Slug</th>
+                <th>Sponsor</th>
+                <th>Country</th>
+                <th />
               </tr>
             </thead>
             <tbody>
               {locations.map((l) => (
-                <tr key={l.id} style={{ borderTop: "1px solid #30363d" }}>
-                  <td style={td}>{l.id}</td>
-                  <td style={td}>{l.name}</td>
-                  <td style={td}>
+                <tr key={l.id}>
+                  <td>{l.id}</td>
+                  <td>{l.name}</td>
+                  <td>
                     <code>{l.slug}</code>
                   </td>
-                  <td style={td}>{l.sponsor_name ?? "—"}</td>
-                  <td style={td}>{l.country ?? "—"}</td>
-                  <td style={td}>
+                  <td>{l.sponsor_name ?? "—"}</td>
+                  <td>{l.country ?? "—"}</td>
+                  <td>
                     <button type="button" onClick={() => void onDelete(l.id)} style={dangerBtn}>
                       Delete
                     </button>

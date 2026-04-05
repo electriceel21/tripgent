@@ -2,7 +2,17 @@
 
 import type { FormEvent } from "react";
 import { useCallback, useEffect, useState } from "react";
-import { btnStyle, inputStyle, main, section, td, th } from "@/lib/admin-page-styles";
+import {
+  btnStyle,
+  compactBtn,
+  inputStyle,
+  labelStyle,
+  main,
+  pageHeading,
+  pageSub,
+  section,
+  sectionTitle,
+} from "@/lib/admin-page-styles";
 import { clientFetch } from "@/lib/client-api";
 
 type OfferOpt = { id: number; title: string };
@@ -88,22 +98,22 @@ export default function PurchasesPage() {
 
   return (
     <main style={main}>
-      <h1 style={{ fontSize: "1.5rem", marginBottom: "0.5rem" }}>Purchases</h1>
-      <p style={{ color: "var(--muted)", marginBottom: "1.25rem" }}>
+      <h1 style={pageHeading}>Purchases</h1>
+      <p style={pageSub}>
         Record a purchase; confirming applies reputation and pool spend.
       </p>
       <section style={section}>
-        <h2 style={{ fontSize: "1rem", marginTop: 0 }}>New purchase</h2>
+        <h2 style={sectionTitle}>New purchase</h2>
         <form onSubmit={onCreate} style={{ display: "grid", gap: "0.75rem", maxWidth: 420 }}>
-          <label style={{ display: "grid", gap: 4, fontSize: "0.85rem" }}>
+          <label style={labelStyle}>
             User external ID
             <input value={externalId} onChange={(e) => setExternalId(e.target.value)} required style={inputStyle} />
           </label>
-          <label style={{ display: "grid", gap: 4, fontSize: "0.85rem" }}>
+          <label style={labelStyle}>
             Display name (optional)
             <input value={displayName} onChange={(e) => setDisplayName(e.target.value)} style={inputStyle} />
           </label>
-          <label style={{ display: "grid", gap: 4, fontSize: "0.85rem" }}>
+          <label style={labelStyle}>
             Offer
             <select value={offerId} onChange={(e) => setOfferId(e.target.value)} required style={inputStyle}>
               <option value="">— select —</option>
@@ -114,7 +124,7 @@ export default function PurchasesPage() {
               ))}
             </select>
           </label>
-          <label style={{ display: "grid", gap: 4, fontSize: "0.85rem" }}>
+          <label style={labelStyle}>
             Amount USD (optional)
             <input
               type="number"
@@ -125,7 +135,7 @@ export default function PurchasesPage() {
               style={inputStyle}
             />
           </label>
-          <label style={{ display: "grid", gap: 4, fontSize: "0.85rem" }}>
+          <label style={labelStyle}>
             Status
             <select
               value={status}
@@ -141,39 +151,39 @@ export default function PurchasesPage() {
           </button>
         </form>
       </section>
-      {msg ? <p style={{ color: "#f85149", marginBottom: "1rem" }}>{msg}</p> : null}
+      {msg ? <p className="admin-msg-error">{msg}</p> : null}
       <section style={section}>
-        <h2 style={{ fontSize: "1rem", marginTop: 0 }}>
+        <h2 style={sectionTitle}>
           Recent {loading ? "(loading…)" : `(${purchases.length})`}
         </h2>
         <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.9rem" }}>
+          <table className="admin-table">
             <thead>
-              <tr style={{ textAlign: "left", color: "var(--muted)" }}>
-                <th style={th}>ID</th>
-                <th style={th}>User</th>
-                <th style={th}>Offer</th>
-                <th style={th}>Amt</th>
-                <th style={th}>Status</th>
-                <th style={th} />
+              <tr>
+                <th>ID</th>
+                <th>User</th>
+                <th>Offer</th>
+                <th>Amt</th>
+                <th>Status</th>
+                <th />
               </tr>
             </thead>
             <tbody>
               {purchases.map((p) => (
-                <tr key={p.id} style={{ borderTop: "1px solid #30363d" }}>
-                  <td style={td}>{p.id}</td>
-                  <td style={td}>
+                <tr key={p.id}>
+                  <td>{p.id}</td>
+                  <td>
                     <code style={{ fontSize: "0.75rem" }}>{p.external_id ?? p.user_id}</code>
                     {p.tier ? ` · ${p.tier}` : ""}
                   </td>
-                  <td style={td}>{p.offer_title ?? p.offer_id}</td>
-                  <td style={td}>
+                  <td>{p.offer_title ?? p.offer_id}</td>
+                  <td>
                     {p.amount_cents != null ? (Number(p.amount_cents) / 100).toFixed(2) : "—"}
                   </td>
-                  <td style={td}>{p.status}</td>
-                  <td style={td}>
+                  <td>{p.status}</td>
+                  <td>
                     {p.status === "pending" ? (
-                      <button type="button" onClick={() => void confirmPurchase(p.id)} style={btnStyle}>
+                      <button type="button" onClick={() => void confirmPurchase(p.id)} style={compactBtn}>
                         Confirm
                       </button>
                     ) : (

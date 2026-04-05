@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Tripgent Admin - Offers</title>
+<!-- BEGIN: Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- END: Tailwind CSS CDN -->
+<!-- BEGIN: Tailwind Configuration -->
+<script data-purpose="tailwind-config">
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'midnight-bg': '#0a0e14',
+            'midnight-card': '#161b22',
+            'midnight-border': '#30363d',
+            'midnight-input': '#0d1117',
+            'midnight-text': '#c9d1d9',
+            'midnight-muted': '#8b949e',
+            'tripgent-blue': '#58a6ff',
+            'tripgent-hover': '#388bfd',
+            'danger-red': '#f85149'
+          }
+        }
+      }
+    }
+  </script>
+<!-- END: Tailwind Configuration -->
+<!-- BEGIN: Custom Styles -->
+<style data-purpose="custom-overrides">
+    body {
+      background-color: #0a0e14;
+      color: #c9d1d9;
+    }
+    input, select, textarea {
+      background-color: #0d1117 !important;
+      border: 1px solid #30363d !important;
+      color: #c9d1d9 !important;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: #58a6ff !important;
+      ring-color: #58a6ff !important;
+    }
+  </style>
+<!-- END: Custom Styles -->
+</head>
+<body class="min-h-screen font-sans">
+<!-- BEGIN: Navigation -->
+<nav class="bg-midnight-bg border-b border-midnight-border px-8 py-4 flex items-center space-x-6 text-sm font-semibold">
+<div class="text-tripgent-blue text-lg font-bold pr-4">Tripgent Admin</div>
+<a class="text-midnight-muted hover:text-white transition-colors" href="#">Sponsors</a>
+<a class="text-midnight-muted hover:text-white transition-colors" href="#">Locations</a>
+<a class="text-midnight-muted hover:text-white transition-colors" href="#">Pools</a>
+<a class="text-white border-b-2 border-tripgent-blue pb-1" href="#">Offers</a>
+<a class="text-midnight-muted hover:text-white transition-colors" href="#">Users</a>
+<a class="text-midnight-muted hover:text-white transition-colors" href="#">Purchases</a>
+<a class="text-midnight-muted hover:text-white transition-colors" href="#">Rewards</a>
+</nav>
+<!-- END: Navigation -->
+<!-- BEGIN: Main Content Container -->
+<main class="max-w-6xl mx-auto p-8 space-y-8">
+<!-- BEGIN: Header Section -->
+<section data-purpose="header-section">
+<h1 class="text-3xl font-bold mb-2">Offers</h1>
+<p class="text-midnight-muted">Link offers to optional location and pool. Reward is in USD for display; stored as cents.</p>
+</section>
+<!-- END: Header Section -->
+<!-- BEGIN: New Offer Form Card -->
+<section class="bg-midnight-card border border-midnight-border rounded-lg p-6 shadow-xl" data-purpose="new-offer-card">
+<h2 class="text-xl font-bold mb-6">New offer</h2>
+<form class="space-y-4 max-w-2xl">
+<!-- Sponsor Selection -->
+<div data-purpose="form-group">
+<label class="block text-sm font-medium mb-1">Sponsor</label>
+<select class="w-full rounded-md border-midnight-border shadow-sm focus:ring-tripgent-blue">
+<option>— select —</option>
+<option>Air Monaco</option>
+<option>Test Air</option>
+</select>
+</div>
+<!-- Location Selection -->
+<div data-purpose="form-group">
+<label class="block text-sm font-medium mb-1">Location (optional)</label>
+<select class="w-full rounded-md border-midnight-border shadow-sm focus:ring-tripgent-blue">
+<option>— none —</option>
+</select>
+</div>
+<!-- Pool Selection -->
+<div data-purpose="form-group">
+<label class="block text-sm font-medium mb-1">Pool (optional)</label>
+<select class="w-full rounded-md border-midnight-border shadow-sm focus:ring-tripgent-blue">
+<option>— none —</option>
+</select>
+</div>
+<!-- Title Input -->
+<div data-purpose="form-group">
+<label class="block text-sm font-medium mb-1">Title</label>
+<input class="w-full rounded-md border-midnight-border shadow-sm focus:ring-tripgent-blue" placeholder="" type="text"/>
+</div>
+<!-- Description Input -->
+<div data-purpose="form-group">
+<label class="block text-sm font-medium mb-1">Description (optional)</label>
+<input class="w-full rounded-md border-midnight-border shadow-sm focus:ring-tripgent-blue" placeholder="" type="text"/>
+</div>
+<!-- Purchase URL Input -->
+<div data-purpose="form-group">
+<label class="block text-sm font-medium mb-1">Purchase URL (optional)</label>
+<input class="w-full rounded-md border-midnight-border shadow-sm focus:ring-tripgent-blue" placeholder="" type="url"/>
+</div>
+<!-- Reward Input -->
+<div data-purpose="form-group">
+<label class="block text-sm font-medium mb-1">Reward (USD)</label>
+<input class="w-full rounded-md border-midnight-border shadow-sm focus:ring-tripgent-blue" step="0.01" type="number" value="0"/>
+</div>
+<!-- Submit Button -->
+<div class="pt-2">
+<button class="bg-tripgent-blue hover:bg-tripgent-hover text-white font-bold py-2 px-6 rounded-md transition-all" type="submit">
+            Create
+          </button>
+</div>
+</form>
+</section>
+<!-- END: New Offer Form Card -->
+<!-- BEGIN: Offers Table Card -->
+<section class="bg-midnight-card border border-midnight-border rounded-lg overflow-hidden shadow-xl" data-purpose="offers-list-card">
+<div class="p-6 border-b border-midnight-border">
+<h2 class="text-xl font-bold">Offers (5)</h2>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse" id="offers-table">
+<thead>
+<tr class="text-midnight-muted border-b border-midnight-border text-sm">
+<th class="px-6 py-4 font-semibold">ID</th>
+<th class="px-6 py-4 font-semibold">Title</th>
+<th class="px-6 py-4 font-semibold">Sponsor</th>
+<th class="px-6 py-4 font-semibold">Reward $</th>
+<th class="px-6 py-4 font-semibold">Active</th>
+<th class="px-6 py-4 font-semibold"></th>
+</tr>
+</thead>
+<tbody class="divide-y divide-midnight-border">
+<!-- Row 5 -->
+<tr class="hover:bg-midnight-input transition-colors">
+<td class="px-6 py-4">5</td>
+<td class="px-6 py-4">Fado night</td>
+<td class="px-6 py-4">Test Air</td>
+<td class="px-6 py-4">2.50</td>
+<td class="px-6 py-4">yes</td>
+<td class="px-6 py-4 text-right">
+<button class="bg-danger-red hover:opacity-80 text-white text-xs font-bold py-1 px-3 rounded">Delete</button>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-midnight-input transition-colors">
+<td class="px-6 py-4">4</td>
+<td class="px-6 py-4">Discover: Casino Square &amp; luxury retail</td>
+<td class="px-6 py-4">Air Monaco</td>
+<td class="px-6 py-4">0.20</td>
+<td class="px-6 py-4">yes</td>
+<td class="px-6 py-4 text-right">
+<button class="bg-danger-red hover:opacity-80 text-white text-xs font-bold py-1 px-3 rounded">Delete</button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-midnight-input transition-colors">
+<td class="px-6 py-4">3</td>
+<td class="px-6 py-4">Discover: Fontvieille harbour dinner</td>
+<td class="px-6 py-4">Air Monaco</td>
+<td class="px-6 py-4">0.35</td>
+<td class="px-6 py-4">yes</td>
+<td class="px-6 py-4 text-right">
+<button class="bg-danger-red hover:opacity-80 text-white text-xs font-bold py-1 px-3 rounded">Delete</button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-midnight-input transition-colors">
+<td class="px-6 py-4">2</td>
+<td class="px-6 py-4">Discover: La Condamine market lunch</td>
+<td class="px-6 py-4">Air Monaco</td>
+<td class="px-6 py-4">0.25</td>
+<td class="px-6 py-4">yes</td>
+<td class="px-6 py-4 text-right">
+<button class="bg-danger-red hover:opacity-80 text-white text-xs font-bold py-1 px-3 rounded">Delete</button>
+</td>
+</tr>
+<!-- Row 1 -->
+<tr class="hover:bg-midnight-input transition-colors">
+<td class="px-6 py-4">1</td>
+<td class="px-6 py-4">Discover: Larvotto &amp; seafront stroll</td>
+<td class="px-6 py-4">Air Monaco</td>
+<td class="px-6 py-4">0.25</td>
+<td class="px-6 py-4">yes</td>
+<td class="px-6 py-4 text-right">
+<button class="bg-danger-red hover:opacity-80 text-white text-xs font-bold py-1 px-3 rounded">Delete</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- END: Offers Table Card -->
+</main>
+<!-- END: Main Content Container -->
+</body></html>

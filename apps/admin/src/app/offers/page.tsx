@@ -6,10 +6,12 @@ import {
   btnStyle,
   dangerBtn,
   inputStyle,
+  labelStyle,
   main,
+  pageHeading,
+  pageSub,
   section,
-  td,
-  th,
+  sectionTitle,
 } from "@/lib/admin-page-styles";
 import { clientFetch } from "@/lib/client-api";
 
@@ -124,7 +126,7 @@ export default function OffersPage() {
           onSubmit={onCreate}
           style={{ display: "grid", gap: "0.75rem", maxWidth: 480 }}
         >
-          <label style={{ display: "grid", gap: 4, fontSize: "0.85rem" }}>
+          <label style={labelStyle}>
             Sponsor
             <select
               value={sponsorId}
@@ -140,7 +142,7 @@ export default function OffersPage() {
               ))}
             </select>
           </label>
-          <label style={{ display: "grid", gap: 4, fontSize: "0.85rem" }}>
+          <label style={labelStyle}>
             Location (optional)
             <select
               value={locationId}
@@ -155,7 +157,7 @@ export default function OffersPage() {
               ))}
             </select>
           </label>
-          <label style={{ display: "grid", gap: 4, fontSize: "0.85rem" }}>
+          <label style={labelStyle}>
             Pool (optional)
             <select
               value={poolId}
@@ -170,19 +172,19 @@ export default function OffersPage() {
               ))}
             </select>
           </label>
-          <label style={{ display: "grid", gap: 4, fontSize: "0.85rem" }}>
+          <label style={labelStyle}>
             Title
             <input value={title} onChange={(e) => setTitle(e.target.value)} required style={inputStyle} />
           </label>
-          <label style={{ display: "grid", gap: 4, fontSize: "0.85rem" }}>
+          <label style={labelStyle}>
             Description (optional)
             <input value={description} onChange={(e) => setDescription(e.target.value)} style={inputStyle} />
           </label>
-          <label style={{ display: "grid", gap: 4, fontSize: "0.85rem" }}>
+          <label style={labelStyle}>
             Purchase URL (optional)
             <input value={purchaseUrl} onChange={(e) => setPurchaseUrl(e.target.value)} style={inputStyle} />
           </label>
-          <label style={{ display: "grid", gap: 4, fontSize: "0.85rem" }}>
+          <label style={labelStyle}>
             Reward (USD)
             <input
               type="number"
@@ -199,35 +201,33 @@ export default function OffersPage() {
         </form>
       </section>
 
-      {msg ? (
-        <p style={{ color: "#f85149", marginBottom: "1rem" }}>{msg}</p>
-      ) : null}
+      {msg ? <p className="admin-msg-error">{msg}</p> : null}
 
       <section style={section}>
-        <h2 style={{ fontSize: "1rem", marginTop: 0 }}>
+        <h2 style={sectionTitle}>
           Offers {loading ? "(loading…)" : `(${offers.length})`}
         </h2>
         <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.9rem" }}>
+          <table className="admin-table">
             <thead>
-              <tr style={{ textAlign: "left", color: "var(--muted)" }}>
-                <th style={th}>ID</th>
-                <th style={th}>Title</th>
-                <th style={th}>Sponsor</th>
-                <th style={th}>Reward $</th>
-                <th style={th}>Active</th>
-                <th style={th} />
+              <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Sponsor</th>
+                <th>Reward $</th>
+                <th>Active</th>
+                <th />
               </tr>
             </thead>
             <tbody>
               {offers.map((o) => (
-                <tr key={o.id} style={{ borderTop: "1px solid #30363d" }}>
-                  <td style={td}>{o.id}</td>
-                  <td style={td}>{o.title}</td>
-                  <td style={td}>{o.sponsor_name ?? o.sponsor_id}</td>
-                  <td style={td}>{(Number(o.reward_cents) / 100).toFixed(2)}</td>
-                  <td style={td}>{o.active ? "yes" : "no"}</td>
-                  <td style={td}>
+                <tr key={o.id}>
+                  <td>{o.id}</td>
+                  <td>{o.title}</td>
+                  <td>{o.sponsor_name ?? o.sponsor_id}</td>
+                  <td>{(Number(o.reward_cents) / 100).toFixed(2)}</td>
+                  <td>{o.active ? "yes" : "no"}</td>
+                  <td>
                     <button type="button" onClick={() => void onDelete(o.id)} style={dangerBtn}>
                       Delete
                     </button>

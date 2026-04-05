@@ -7,10 +7,12 @@ import {
   btnStyle,
   dangerBtn,
   inputStyle,
+  labelStyle,
   main,
+  pageHeading,
+  pageSub,
   section,
-  td,
-  th,
+  sectionTitle,
 } from "@/lib/admin-page-styles";
 
 type Sponsor = {
@@ -79,18 +81,18 @@ export default function SponsorsPage() {
 
   return (
     <main style={main}>
-      <h1 style={{ fontSize: "1.5rem", marginBottom: "0.5rem" }}>Sponsors</h1>
-      <p style={{ color: "var(--muted)", marginBottom: "1.25rem" }}>
+      <h1 style={pageHeading}>Sponsors</h1>
+      <p style={pageSub}>
         Create and list sponsors. Slug is derived from name if omitted.
       </p>
 
       <section style={section}>
-        <h2 style={{ fontSize: "1rem", marginTop: 0 }}>New sponsor</h2>
+        <h2 style={sectionTitle}>New sponsor</h2>
         <form
           onSubmit={onCreate}
           style={{ display: "grid", gap: "0.75rem", maxWidth: 420 }}
         >
-          <label style={{ display: "grid", gap: 4, fontSize: "0.85rem" }}>
+          <label style={labelStyle}>
             Name
             <input
               value={name}
@@ -103,7 +105,7 @@ export default function SponsorsPage() {
             Slug (optional)
             <input value={slug} onChange={(e) => setSlug(e.target.value)} style={inputStyle} />
           </label>
-          <label style={{ display: "grid", gap: 4, fontSize: "0.85rem" }}>
+          <label style={labelStyle}>
             Website (optional)
             <input value={website} onChange={(e) => setWebsite(e.target.value)} style={inputStyle} />
           </label>
@@ -113,35 +115,33 @@ export default function SponsorsPage() {
         </form>
       </section>
 
-      {msg ? (
-        <p style={{ color: "#f85149", marginBottom: "1rem" }}>{msg}</p>
-      ) : null}
+      {msg ? <p className="admin-msg-error">{msg}</p> : null}
 
       <section style={section}>
-        <h2 style={{ fontSize: "1rem", marginTop: 0 }}>
+        <h2 style={sectionTitle}>
           All sponsors {loading ? "(loading…)" : `(${sponsors.length})`}
         </h2>
         <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.9rem" }}>
+          <table className="admin-table">
             <thead>
-              <tr style={{ textAlign: "left", color: "var(--muted)" }}>
-                <th style={th}>ID</th>
-                <th style={th}>Name</th>
-                <th style={th}>Slug</th>
-                <th style={th}>Website</th>
-                <th style={th} />
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Slug</th>
+                <th>Website</th>
+                <th />
               </tr>
             </thead>
             <tbody>
               {sponsors.map((s) => (
-                <tr key={s.id} style={{ borderTop: "1px solid #30363d" }}>
-                  <td style={td}>{s.id}</td>
-                  <td style={td}>{s.name}</td>
-                  <td style={td}>
+                <tr key={s.id}>
+                  <td>{s.id}</td>
+                  <td>{s.name}</td>
+                  <td>
                     <code>{s.slug}</code>
                   </td>
-                  <td style={td}>{s.website ?? "—"}</td>
-                  <td style={td}>
+                  <td>{s.website ?? "—"}</td>
+                  <td>
                     <button type="button" onClick={() => void onDelete(s.id)} style={dangerBtn}>
                       Delete
                     </button>

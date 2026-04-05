@@ -1,47 +1,75 @@
-import type { CSSProperties } from "react";
-import Link from "next/link";
+"use client";
 
-const linkStyle: CSSProperties = {
-  color: "var(--accent)",
-  textDecoration: "none",
-  fontSize: "0.9rem",
-  marginRight: "1rem",
-};
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+
+const links = [
+  { href: "/sponsors", label: "Sponsors" },
+  { href: "/locations", label: "Locations" },
+  { href: "/pools", label: "Pools" },
+  { href: "/offers", label: "Offers" },
+  { href: "/users", label: "Users" },
+  { href: "/purchases", label: "Purchases" },
+  { href: "/rewards", label: "Rewards" },
+] as const;
 
 export function AdminNav() {
+  const pathname = usePathname();
+
   return (
     <header
       style={{
-        borderBottom: "1px solid #30363d",
-        padding: "0.75rem 1.5rem",
-        background: "#0c0f14",
+        borderBottom: "1px solid var(--border)",
+        background: "var(--midnight)",
       }}
     >
-      <nav style={{ maxWidth: 1100, margin: "0 auto", display: "flex", flexWrap: "wrap", gap: "0.5rem", alignItems: "center" }}>
-        <Link href="/" style={{ ...linkStyle, fontWeight: 700 }}>
+      <nav
+        style={{
+          maxWidth: "80rem",
+          margin: "0 auto",
+          padding: "0 1rem",
+          height: "4rem",
+          display: "flex",
+          alignItems: "center",
+          gap: "0.5rem",
+          flexWrap: "wrap",
+        }}
+      >
+        <Link
+          href="/"
+          style={{
+            color: "var(--accent)",
+            fontWeight: 700,
+            fontSize: "1.125rem",
+            marginRight: "1.25rem",
+            textDecoration: "none",
+          }}
+        >
           Tripgent Admin
         </Link>
-        <Link href="/sponsors" style={linkStyle}>
-          Sponsors
-        </Link>
-        <Link href="/locations" style={linkStyle}>
-          Locations
-        </Link>
-        <Link href="/pools" style={linkStyle}>
-          Pools
-        </Link>
-        <Link href="/offers" style={linkStyle}>
-          Offers
-        </Link>
-        <Link href="/users" style={linkStyle}>
-          Users
-        </Link>
-        <Link href="/purchases" style={linkStyle}>
-          Purchases
-        </Link>
-        <Link href="/rewards" style={linkStyle}>
-          Rewards
-        </Link>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "1.25rem", alignItems: "center" }}>
+          {links.map(({ href, label }) => {
+            const active =
+              pathname === href || (href !== "/" && pathname.startsWith(href));
+            return (
+              <Link
+                key={href}
+                href={href}
+                style={{
+                  fontSize: "0.875rem",
+                  fontWeight: 500,
+                  color: active ? "var(--accent)" : "var(--muted)",
+                  textDecoration: "none",
+                  paddingBottom: "0.2rem",
+                  borderBottom: active ? "2px solid var(--accent)" : "2px solid transparent",
+                  transition: "color 0.15s ease",
+                }}
+              >
+                {label}
+              </Link>
+            );
+          })}
+        </div>
       </nav>
     </header>
   );

@@ -78,49 +78,27 @@ export default async function AdminHome() {
   const supabaseHost = supabaseHostFromEnv();
 
   return (
-    <main
-      style={{
-        maxWidth: 720,
-        margin: "0 auto",
-        padding: "3rem 1.5rem",
-        lineHeight: 1.6,
-      }}
-    >
-      <p style={{ color: "var(--accent)", fontSize: "0.8rem", marginBottom: "0.35rem" }}>
-        Web application · desktop browser
-      </p>
-      <h1 style={{ fontSize: "1.75rem", fontWeight: 700, marginBottom: "0.5rem" }}>
-        Tripgent Admin
-      </h1>
-      <p style={{ color: "var(--muted)", marginBottom: "0.35rem" }}>
+    <main className="admin-shell admin-shell--narrow">
+      <p className="admin-kicker">Web application · desktop browser</p>
+      <h1 className="admin-page-title">Tripgent Admin</h1>
+      <p className="admin-lede" style={{ marginBottom: "0.5rem" }}>
         Internal console. API base:{" "}
         <code style={{ color: "var(--accent)" }}>{getApiBaseUrl()}</code>
       </p>
       {supabaseHost ? (
-        <p style={{ color: "var(--muted)", marginBottom: "1.5rem", fontSize: "0.85rem" }}>
+        <p className="admin-lede" style={{ fontSize: "0.85rem", marginBottom: "2.5rem" }}>
           Supabase host (Vercel server env — must match the project where you ran SQL):{" "}
           <code style={{ color: "var(--accent)" }}>{supabaseHost}</code>
         </p>
       ) : (
-        <p style={{ color: "var(--muted)", marginBottom: "1.5rem", fontSize: "0.85rem" }}>
+        <p className="admin-lede" style={{ fontSize: "0.85rem", marginBottom: "2.5rem" }}>
           <code>SUPABASE_URL</code> not set on this deployment — API cannot reach your database.
         </p>
       )}
 
       {dashboardAllZero ? (
-        <section
-          style={{
-            background: "#21262d",
-            border: "1px solid #f0883e",
-            borderRadius: 12,
-            padding: "1rem 1.25rem",
-            marginBottom: "1.25rem",
-            fontSize: "0.88rem",
-            lineHeight: 1.55,
-            color: "#e6edf3",
-          }}
-        >
-          <strong style={{ color: "#f0883e" }}>Dashboard counts are all zero</strong> even though SQL
+        <section className="admin-alert admin-alert--warn">
+          <strong style={{ color: "#fb923c" }}>Dashboard counts are all zero</strong> even though SQL
           ran? Usually one of these:
           <ul style={{ margin: "0.75rem 0 0", paddingLeft: "1.25rem" }}>
             <li>
@@ -144,18 +122,8 @@ export default async function AdminHome() {
       ) : null}
 
       {vercelWall ? (
-        <section
-          style={{
-            background: "#3d2115",
-            border: "1px solid #a371f7",
-            borderRadius: 12,
-            padding: "1rem 1.25rem",
-            marginBottom: "1.25rem",
-            fontSize: "0.9rem",
-            lineHeight: 1.55,
-          }}
-        >
-          <strong style={{ color: "#f0883e" }}>Vercel Deployment Protection</strong> is likely
+        <section className="admin-alert admin-alert--purple">
+          <strong style={{ color: "#fb923c" }}>Vercel Deployment Protection</strong> is likely
           blocking API requests. The dashboard calls your own URL from the server, which does not
           use your browser login. Fix one of these:
           <ul style={{ margin: "0.75rem 0 0", paddingLeft: "1.25rem" }}>
@@ -177,80 +145,57 @@ export default async function AdminHome() {
         </section>
       ) : null}
 
-      <section
-        style={{
-          background: "var(--surface)",
-          borderRadius: 12,
-          padding: "1.25rem 1.5rem",
-          marginBottom: "1.25rem",
-        }}
-      >
-        <h2 style={{ fontSize: "1rem", margin: "0 0 0.75rem" }}>Live API check</h2>
-        <p style={{ margin: "0 0 0.5rem", color: "var(--muted)", fontSize: "0.9rem" }}>
-          <strong style={{ color: health.ok && health.data?.ok ? "#3fb950" : "#f85149" }}>
-            {health.ok && health.data?.ok ? "●" : "●"}
-          </strong>{" "}
-          <code>/health</code>{" "}
-          {health.ok && health.data?.ok
-            ? "OK"
-            : health.error ?? (health.data?.ok === false ? "unexpected body" : "failed")}
-        </p>
-        <p style={{ margin: "0 0 0.5rem", color: "var(--muted)", fontSize: "0.9rem" }}>
-          <strong
-            style={{
-              color: dashboard.ok ? "#3fb950" : "#f85149",
-            }}
-          >
-            {dashboard.ok ? "●" : "●"}
-          </strong>{" "}
-          <code>/v1/admin/dashboard</code>{" "}
-          {dashboard.ok ? "OK" : dashboard.error ?? "failed"}
-        </p>
+      <section className="admin-card">
+        <h2 className="admin-card__title">Live API check</h2>
+        <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", marginBottom: "1rem" }}>
+          <p style={{ margin: 0, color: "var(--muted)", fontSize: "0.9rem", display: "flex", alignItems: "center" }}>
+            <span
+              className={
+                health.ok && health.data?.ok ? "admin-status-dot admin-status-dot--ok" : "admin-status-dot admin-status-dot--err"
+              }
+            />
+            <span>
+              <code>/health</code>{" "}
+              {health.ok && health.data?.ok
+                ? "OK"
+                : health.error ?? (health.data?.ok === false ? "unexpected body" : "failed")}
+            </span>
+          </p>
+          <p style={{ margin: 0, color: "var(--muted)", fontSize: "0.9rem", display: "flex", alignItems: "center" }}>
+            <span className={dashboard.ok ? "admin-status-dot admin-status-dot--ok" : "admin-status-dot admin-status-dot--err"} />
+            <span>
+              <code>/v1/admin/dashboard</code> {dashboard.ok ? "OK" : dashboard.error ?? "failed"}
+            </span>
+          </p>
+        </div>
         {dashboard.ok && dashboard.data ? (
-          <pre
-            style={{
-              margin: "0.75rem 0 0",
-              padding: "0.75rem",
-              background: "#0d1117",
-              borderRadius: 8,
-              fontSize: "0.8rem",
-              overflow: "auto",
-              color: "#e6edf3",
-            }}
-          >
-            {JSON.stringify(dashboard.data, null, 2)}
-          </pre>
+          <pre className="admin-json-block">{JSON.stringify(dashboard.data, null, 2)}</pre>
         ) : null}
       </section>
 
-      <section
-        style={{
-          background: "var(--surface)",
-          borderRadius: 12,
-          padding: "1.25rem 1.5rem",
-          marginBottom: "1.25rem",
-        }}
-      >
-        <h2 style={{ fontSize: "1rem", margin: "0 0 0.75rem" }}>Modules</h2>
-        <p style={{ margin: 0, color: "var(--muted)", fontSize: "0.95rem" }}>
+      <section className="admin-card">
+        <h2 className="admin-card__title">Modules</h2>
+        <p style={{ margin: 0, color: "var(--muted)", fontSize: "0.95rem", lineHeight: 1.65 }}>
           Use the top nav: Sponsors, Locations, Pools, Offers, Users, Purchases, Rewards. For the
           traveler app see <code style={{ color: "var(--accent)" }}>apps/mobile</code>.
         </p>
       </section>
 
-      <p style={{ fontSize: "0.85rem", color: "var(--muted)" }}>
-        Env: root <code>.env</code> or Vercel — <code>ADMIN_API_KEY</code> (server). If the API
-        enforces it, set <code>NEXT_PUBLIC_ADMIN_API_KEY</code> to the same value for browser CRUD,
-        or unset <code>ADMIN_API_KEY</code> only for a throwaway public test.
-      </p>
-      <p style={{ fontSize: "0.85rem", color: "var(--muted)", marginTop: "0.5rem" }}>
-        <strong>Chat:</strong> use the <code>apps/mobile</code> app with{" "}
-        <code>EXPO_PUBLIC_TRIPGENT_API_URL</code> pointing at this deployment, or{" "}
-        <code>POST {getApiBaseUrl()}/v1/chat</code> with JSON body{" "}
-        <code style={{ color: "var(--accent)" }}>messages: [&#123; role, content &#125;]</code>
-        (and <code>Authorization: Bearer …</code> if <code>API_AUTH_BEARER</code> is set). Fix
-        Deployment Protection first or those calls get HTML 401 too.
-      </p>
+      <footer className="admin-footer-note">
+        <p style={{ margin: "0 0 0.75rem" }}>
+          Env: root <code>.env</code> or Vercel — <code>ADMIN_API_KEY</code> (server). If the API
+          enforces it, set <code>NEXT_PUBLIC_ADMIN_API_KEY</code> to the same value for browser CRUD,
+          or unset <code>ADMIN_API_KEY</code> only for a throwaway public test.
+        </p>
+        <p style={{ margin: 0 }}>
+          <strong>Chat:</strong> use the <code>apps/mobile</code> app with{" "}
+          <code>EXPO_PUBLIC_TRIPGENT_API_URL</code> pointing at this deployment, or{" "}
+          <code>POST {getApiBaseUrl()}/v1/chat</code> with JSON body{" "}
+          <code style={{ color: "var(--accent)" }}>messages: [&#123; role, content &#125;]</code>
+          (and <code>Authorization: Bearer …</code> if <code>API_AUTH_BEARER</code> is set). Fix
+          Deployment Protection first or those calls get HTML 401 too.
+        </p>
+      </footer>
     </main>
   );
 }

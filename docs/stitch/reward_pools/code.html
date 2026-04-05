@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Tripgent Admin - Reward Pools</title>
+<!-- Tailwind CSS v3 CDN with plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- BEGIN: Tailwind Configuration -->
+<script data-purpose="tailwind-config">
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            midnight: {
+              950: '#0b1120', // Dark background
+              900: '#111827', // Slightly lighter dark
+              800: '#1f2937', // Card/Input background
+              700: '#374151', // Borders/Accents
+            },
+            tripgent: {
+              blue: '#60a5fa', // Brand blue
+              link: '#3b82f6',
+            }
+          }
+        }
+      }
+    }
+  </script>
+<!-- END: Tailwind Configuration -->
+<!-- BEGIN: Custom Styles -->
+<style data-purpose="global-typography">
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+  </style>
+<style data-purpose="form-elements">
+    /* Custom styling for inputs to match the Aero Midnight aesthetic */
+    input[type="text"], 
+    input[type="number"], 
+    select {
+      background-color: #0b1120 !important;
+      border-color: #374151 !important;
+      color: #e5e7eb !important;
+    }
+    input:focus, select:focus {
+      border-color: #60a5fa !important;
+      ring-color: #60a5fa !important;
+    }
+  </style>
+<!-- END: Custom Styles -->
+</head>
+<body class="bg-midnight-950 text-gray-200 min-h-screen">
+<!-- BEGIN: MainHeader -->
+<header class="border-b border-gray-800 bg-midnight-950 px-6 py-4">
+<nav class="flex items-center space-x-6 text-sm font-medium">
+<div class="text-tripgent-blue font-bold text-lg mr-4" data-purpose="brand-logo">
+        Tripgent Admin
+      </div>
+<a class="text-gray-400 hover:text-white transition-colors" href="#">Sponsors</a>
+<a class="text-gray-400 hover:text-white transition-colors" href="#">Locations</a>
+<a class="text-tripgent-blue border-b-2 border-tripgent-blue pb-1" href="#">Pools</a>
+<a class="text-gray-400 hover:text-white transition-colors" href="#">Offers</a>
+<a class="text-gray-400 hover:text-white transition-colors" href="#">Users</a>
+<a class="text-gray-400 hover:text-white transition-colors" href="#">Purchases</a>
+<a class="text-gray-400 hover:text-white transition-colors" href="#">Rewards</a>
+</nav>
+</header>
+<!-- END: MainHeader -->
+<!-- BEGIN: MainContent -->
+<main class="max-w-6xl mx-auto p-8">
+<!-- BEGIN: PageTitle -->
+<section class="mb-8" data-purpose="page-heading">
+<h1 class="text-3xl font-bold text-white mb-2">Reward pools</h1>
+<p class="text-gray-400">Budget in USD. Spent includes confirmations and tier accruals when migration 003 is applied.</p>
+</section>
+<!-- END: PageTitle -->
+<!-- BEGIN: NewPoolForm -->
+<section class="bg-midnight-900 border border-gray-800 rounded-xl p-6 mb-8 shadow-lg" data-purpose="new-pool-container">
+<h2 class="text-xl font-semibold text-white mb-6">New pool</h2>
+<form class="space-y-4 max-w-sm" id="new-pool-form">
+<div>
+<label class="block text-sm font-medium text-gray-400 mb-1">Sponsor</label>
+<select class="w-full rounded-md border-gray-700 bg-midnight-950 text-white focus:ring-tripgent-blue">
+<option>— select —</option>
+<option>Test Air</option>
+<option>Air Monaco</option>
+</select>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-400 mb-1">Location (optional)</label>
+<select class="w-full rounded-md border-gray-700 bg-midnight-950 text-white focus:ring-tripgent-blue">
+<option>— none —</option>
+<option>Lisbon</option>
+<option>Monaco</option>
+</select>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-400 mb-1">Name</label>
+<input class="w-full rounded-md border-gray-700 bg-midnight-950 text-white focus:ring-tripgent-blue" placeholder="" type="text"/>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-400 mb-1">Budget (USD)</label>
+<input class="w-full rounded-md border-gray-700 bg-midnight-950 text-white focus:ring-tripgent-blue" type="number" value="20"/>
+</div>
+<div class="pt-2">
+<button class="bg-tripgent-blue hover:bg-blue-600 text-midnight-950 font-bold py-2 px-4 rounded transition-colors duration-200" type="submit">
+            Create
+          </button>
+</div>
+</form>
+</section>
+<!-- END: NewPoolForm -->
+<!-- BEGIN: PoolsTable -->
+<section class="bg-midnight-900 border border-gray-800 rounded-xl p-6 shadow-lg" data-purpose="pools-list-container">
+<h2 class="text-xl font-semibold text-white mb-6">Pools (2)</h2>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse" id="pools-table">
+<thead>
+<tr class="text-gray-500 text-sm border-b border-gray-800">
+<th class="pb-3 font-medium">ID</th>
+<th class="pb-3 font-medium">Name</th>
+<th class="pb-3 font-medium">Sponsor</th>
+<th class="pb-3 font-medium">Loc</th>
+<th class="pb-3 font-medium">Budget</th>
+<th class="pb-3 font-medium">Spent</th>
+<th class="pb-3 font-medium text-right">Active</th>
+</tr>
+</thead>
+<tbody class="text-sm divide-y divide-gray-800">
+<!-- Row 1 -->
+<tr class="hover:bg-midnight-800 transition-colors">
+<td class="py-4">2</td>
+<td class="py-4">Lisbon rewards</td>
+<td class="py-4">Test Air</td>
+<td class="py-4">Lisbon</td>
+<td class="py-4">100.00</td>
+<td class="py-4">0.0000</td>
+<td class="py-4 text-right">
+<button class="bg-tripgent-blue text-midnight-950 px-3 py-1 rounded text-xs font-bold hover:bg-blue-400">Off</button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-midnight-800 transition-colors">
+<td class="py-4">1</td>
+<td class="py-4">Air Monaco traveler rewards</td>
+<td class="py-4">Air Monaco</td>
+<td class="py-4">Monaco</td>
+<td class="py-4">20.00</td>
+<td class="py-4">0.0000</td>
+<td class="py-4 text-right">
+<button class="bg-tripgent-blue text-midnight-950 px-3 py-1 rounded text-xs font-bold hover:bg-blue-400">Off</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- END: PoolsTable -->
+</main>
+<!-- END: MainContent -->
+<!-- BEGIN: InteractiveHandlers -->
+<script data-purpose="event-handlers">
+    // Minimal logic to simulate form submission
+    document.getElementById('new-pool-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      console.log('Form submission prevented for demo.');
+    });
+
+    // Simple toggle simulation for buttons
+    document.querySelectorAll('button').forEach(btn => {
+      if(btn.innerText === 'Off' || btn.innerText === 'On') {
+        btn.addEventListener('click', function() {
+          this.innerText = this.innerText === 'Off' ? 'On' : 'Off';
+          this.classList.toggle('bg-tripgent-blue');
+          this.classList.toggle('bg-green-500');
+        });
+      }
+    });
+  </script>
+<!-- END: InteractiveHandlers -->
+</body></html>

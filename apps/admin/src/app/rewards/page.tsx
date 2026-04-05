@@ -2,7 +2,16 @@
 
 import type { FormEvent } from "react";
 import { useCallback, useEffect, useState } from "react";
-import { btnStyle, inputStyle, main, section, td, th } from "@/lib/admin-page-styles";
+import {
+  btnStyle,
+  inputStyle,
+  labelStyle,
+  main,
+  pageHeading,
+  pageSub,
+  section,
+  sectionTitle,
+} from "@/lib/admin-page-styles";
 import { clientFetch } from "@/lib/client-api";
 
 type AccrualRow = {
@@ -69,29 +78,29 @@ export default function RewardsPage() {
 
   return (
     <main style={main}>
-      <h1 style={{ fontSize: "1.5rem", marginBottom: "0.5rem" }}>Rewards</h1>
-      <p style={{ color: "var(--muted)", marginBottom: "1.25rem" }}>
+      <h1 style={pageHeading}>Rewards</h1>
+      <p style={pageSub}>
         Tier-rate accruals against sponsor pools. Requires migration{" "}
         <code style={{ color: "var(--accent)" }}>003_reward_accrual_usdc.sql</code> and tier rates
         (e.g. Air Monaco mock).
       </p>
 
       <section style={section}>
-        <h2 style={{ fontSize: "1rem", marginTop: 0 }}>Accrue (test)</h2>
+        <h2 style={sectionTitle}>Accrue (test)</h2>
         <form onSubmit={onAccrue} style={{ display: "grid", gap: "0.75rem", maxWidth: 420 }}>
-          <label style={{ display: "grid", gap: 4, fontSize: "0.85rem" }}>
+          <label style={labelStyle}>
             User external ID
             <input value={externalId} onChange={(e) => setExternalId(e.target.value)} required style={inputStyle} />
           </label>
-          <label style={{ display: "grid", gap: 4, fontSize: "0.85rem" }}>
+          <label style={labelStyle}>
             Display name (optional)
             <input value={displayName} onChange={(e) => setDisplayName(e.target.value)} style={inputStyle} />
           </label>
-          <label style={{ display: "grid", gap: 4, fontSize: "0.85rem" }}>
+          <label style={labelStyle}>
             Sponsor slug
             <input value={sponsorSlug} onChange={(e) => setSponsorSlug(e.target.value)} required style={inputStyle} />
           </label>
-          <label style={{ display: "grid", gap: 4, fontSize: "0.85rem" }}>
+          <label style={labelStyle}>
             Units
             <input
               type="number"
@@ -107,48 +116,44 @@ export default function RewardsPage() {
         </form>
       </section>
 
-      {msg ? <p style={{ color: "#f85149", marginBottom: "1rem" }}>{msg}</p> : null}
-      {note ? (
-        <p style={{ color: "#d29922", marginBottom: "1rem", fontSize: "0.9rem" }}>{note}</p>
-      ) : null}
+      {msg ? <p className="admin-msg-error">{msg}</p> : null}
+      {note ? <p className="admin-msg-warn">{note}</p> : null}
 
       <section style={section}>
-        <h2 style={{ fontSize: "1rem", marginTop: 0 }}>
+        <h2 style={sectionTitle}>
           Recent accruals {loading ? "(loading…)" : `(${accruals.length})`}
         </h2>
         <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.9rem" }}>
+          <table className="admin-table">
             <thead>
-              <tr style={{ textAlign: "left", color: "var(--muted)" }}>
-                <th style={th}>ID</th>
-                <th style={th}>User</th>
-                <th style={th}>Sponsor</th>
-                <th style={th}>Tier</th>
-                <th style={th}>Units</th>
-                <th style={th}>Rate</th>
-                <th style={th}>Amount</th>
-                <th style={th}>Reason</th>
-                <th style={th}>When</th>
+              <tr>
+                <th>ID</th>
+                <th>User</th>
+                <th>Sponsor</th>
+                <th>Tier</th>
+                <th>Units</th>
+                <th>Rate</th>
+                <th>Amount</th>
+                <th>Reason</th>
+                <th>When</th>
               </tr>
             </thead>
             <tbody>
               {accruals.map((a) => (
-                <tr key={a.id} style={{ borderTop: "1px solid #30363d" }}>
-                  <td style={td}>{a.id}</td>
-                  <td style={td}>
+                <tr key={a.id}>
+                  <td>{a.id}</td>
+                  <td>
                     <code style={{ fontSize: "0.75rem" }}>{a.users?.external_id ?? "—"}</code>
                   </td>
-                  <td style={td}>
-                    {a.sponsors?.name ?? a.sponsors?.slug ?? "—"}
-                  </td>
-                  <td style={td}>{a.tier}</td>
-                  <td style={td}>{a.units}</td>
-                  <td style={td}>{String(a.rate_usdc)}</td>
-                  <td style={td}>{String(a.amount_usdc)}</td>
-                  <td style={td}>
+                  <td>{a.sponsors?.name ?? a.sponsors?.slug ?? "—"}</td>
+                  <td>{a.tier}</td>
+                  <td>{a.units}</td>
+                  <td>{String(a.rate_usdc)}</td>
+                  <td>{String(a.amount_usdc)}</td>
+                  <td>
                     <code style={{ fontSize: "0.75rem" }}>{a.reason ?? "—"}</code>
                   </td>
-                  <td style={td}>{new Date(a.created_at).toLocaleString()}</td>
+                  <td>{new Date(a.created_at).toLocaleString()}</td>
                 </tr>
               ))}
             </tbody>

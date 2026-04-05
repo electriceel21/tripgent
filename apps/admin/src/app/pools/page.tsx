@@ -2,7 +2,17 @@
 
 import type { FormEvent } from "react";
 import { useCallback, useEffect, useState } from "react";
-import { btnStyle, inputStyle, main, section, td, th } from "@/lib/admin-page-styles";
+import {
+  btnStyle,
+  compactBtn,
+  inputStyle,
+  labelStyle,
+  main,
+  pageHeading,
+  pageSub,
+  section,
+  sectionTitle,
+} from "@/lib/admin-page-styles";
 import { clientFetch } from "@/lib/client-api";
 
 type Sponsor = { id: number; name: string };
@@ -100,14 +110,14 @@ export default function PoolsPage() {
 
   return (
     <main style={main}>
-      <h1 style={{ fontSize: "1.5rem", marginBottom: "0.5rem" }}>Reward pools</h1>
-      <p style={{ color: "var(--muted)", marginBottom: "1.25rem" }}>
+      <h1 style={pageHeading}>Reward pools</h1>
+      <p style={pageSub}>
         Budget in USD. Spent includes confirmations and tier accruals when migration 003 is applied.
       </p>
       <section style={section}>
-        <h2 style={{ fontSize: "1rem", marginTop: 0 }}>New pool</h2>
+        <h2 style={sectionTitle}>New pool</h2>
         <form onSubmit={onCreate} style={{ display: "grid", gap: "0.75rem", maxWidth: 420 }}>
-          <label style={{ display: "grid", gap: 4, fontSize: "0.85rem" }}>
+          <label style={labelStyle}>
             Sponsor
             <select value={sponsorId} onChange={(e) => setSponsorId(e.target.value)} required style={inputStyle}>
               <option value="">— select —</option>
@@ -118,7 +128,7 @@ export default function PoolsPage() {
               ))}
             </select>
           </label>
-          <label style={{ display: "grid", gap: 4, fontSize: "0.85rem" }}>
+          <label style={labelStyle}>
             Location (optional)
             <select value={locationId} onChange={(e) => setLocationId(e.target.value)} style={inputStyle}>
               <option value="">— none —</option>
@@ -133,7 +143,7 @@ export default function PoolsPage() {
             Name
             <input value={name} onChange={(e) => setName(e.target.value)} required style={inputStyle} />
           </label>
-          <label style={{ display: "grid", gap: 4, fontSize: "0.85rem" }}>
+          <label style={labelStyle}>
             Budget (USD)
             <input
               type="number"
@@ -150,35 +160,35 @@ export default function PoolsPage() {
           </button>
         </form>
       </section>
-      {msg ? <p style={{ color: "#f85149", marginBottom: "1rem" }}>{msg}</p> : null}
+      {msg ? <p className="admin-msg-error">{msg}</p> : null}
       <section style={section}>
-        <h2 style={{ fontSize: "1rem", marginTop: 0 }}>
+        <h2 style={sectionTitle}>
           Pools {loading ? "(loading…)" : `(${pools.length})`}
         </h2>
         <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.9rem" }}>
+          <table className="admin-table">
             <thead>
-              <tr style={{ textAlign: "left", color: "var(--muted)" }}>
-                <th style={th}>ID</th>
-                <th style={th}>Name</th>
-                <th style={th}>Sponsor</th>
-                <th style={th}>Loc</th>
-                <th style={th}>Budget</th>
-                <th style={th}>Spent</th>
-                <th style={th}>Active</th>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Sponsor</th>
+                <th>Loc</th>
+                <th>Budget</th>
+                <th>Spent</th>
+                <th>Active</th>
               </tr>
             </thead>
             <tbody>
               {pools.map((p) => (
-                <tr key={p.id} style={{ borderTop: "1px solid #30363d" }}>
-                  <td style={td}>{p.id}</td>
-                  <td style={td}>{p.name}</td>
-                  <td style={td}>{p.sponsor_name ?? p.sponsor_id}</td>
-                  <td style={td}>{p.location_name ?? "—"}</td>
-                  <td style={td}>{budgetLabel(p)}</td>
-                  <td style={td}>{spentLabel(p)}</td>
-                  <td style={td}>
-                    <button type="button" onClick={() => void toggleActive(p)} style={btnStyle}>
+                <tr key={p.id}>
+                  <td>{p.id}</td>
+                  <td>{p.name}</td>
+                  <td>{p.sponsor_name ?? p.sponsor_id}</td>
+                  <td>{p.location_name ?? "—"}</td>
+                  <td>{budgetLabel(p)}</td>
+                  <td>{spentLabel(p)}</td>
+                  <td>
+                    <button type="button" onClick={() => void toggleActive(p)} style={compactBtn}>
                       {p.active ? "Off" : "On"}
                     </button>
                   </td>

@@ -1,6 +1,6 @@
 {
   "cli": {
-    "version": "16.32.0",
+    "version": ">=16.32.0",
     "appVersionSource": "local"
   },
   "build": {
@@ -8,6 +8,9 @@
       "extends": "base",
       "developmentClient": true,
       "distribution": "internal",
+      "env": {
+        "NODE_ENV": "development"
+      },
       "android": {
         "buildType": "apk"
       }

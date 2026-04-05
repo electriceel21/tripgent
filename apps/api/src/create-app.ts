@@ -27,6 +27,21 @@ function requireEnv(name: string): string {
   return v;
 }
 
+/**
+ * When Dynamic (or client) omits ids, Monaco accrual uses synthetic `wallet:0x…`.
+ * Set `REWARD_FALLBACK_WALLET_ADDRESS` to override; set `REWARD_FALLBACK_DISABLED=1` to turn off.
+ * If env is unset, a built-in default wallet is used so anonymous searches still accrue (this repo).
+ */
+const DEFAULT_ANON_REWARD_WALLET = "0xEB4c34f9170E992cBBffF1902C2b74CBfbD3f652";
+
+function rewardFallbackWalletFromEnv(): string | undefined {
+  if (process.env.REWARD_FALLBACK_DISABLED === "1") return undefined;
+  const fromEnv = process.env.REWARD_FALLBACK_WALLET_ADDRESS?.trim();
+  const candidate = fromEnv || DEFAULT_ANON_REWARD_WALLET;
+  if (!candidate) return undefined;
+  return isValidEvmAddress(candidate) ? candidate : undefined;
+}
+
 function assertInferenceConfig0g() {
   return {
     rpcUrl: requireEnv("RPC_URL"),
@@ -156,12 +171,16 @@ export function createTripgentApp(): Hono {
         message: { role: "assistant" as const, content },
       };
 
-      if (
-        dest === "monaco" &&
-        body.user_external_id?.trim()
-      ) {
+      const fbWallet = rewardFallbackWalletFromEnv();
+      const rewardUserExternalId =
+        body.user_external_id?.trim() ||
+        (fbWallet ? `wallet:${fbWallet.toLowerCase()}` : "");
+      const rewardWalletForMint =
+        body.reward_wallet_address?.trim() || fbWallet || "";
+
+      if (dest === "monaco" && rewardUserExternalId) {
         const acc = await accrueSponsorTierReward(supabase, {
-          userExternalId: body.user_external_id.trim(),
+          userExternalId: rewardUserExternalId,
           sponsorSlug: MONACO_SPONSOR_SLUG,
           displayName: body.display_name,
           units: 1,
@@ -173,7 +192,7 @@ export function createTripgentApp(): Hono {
             tier: acc.tier,
             pool_spent_usdc: acc.spent_usdc,
           };
-          const rw = body.reward_wallet_address?.trim();
+          const rw = rewardWalletForMint.trim();
           if (gatewayCircleRewardEnvConfigured() && rw && isValidEvmAddress(rw)) {
             const minted = await mintGatewayRewardUsdc({
               recipientAddress: rw,

@@ -1,6 +1,6 @@
 {
   "expo": {
-    "owner": "riverplates-organization",
+    "owner": "riverplate",
     "name": "Tripgent",
     "slug": "tripgent",
     "scheme": "tripgent",
@@ -20,11 +20,22 @@
     },
     "plugins": [
       "expo-router",
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "kotlinVersion": "1.9.25"
+          }
+        }
+      ]
     ],
     "extra": {
       "eas": {
-        "projectId": "ec88581c-8161-4ad1-b57a-797e10478c1c"
+        "projectId": "30d9dfd9-a316-408d-aff0-5d27414f0bed"
+      },
+      "router": {
+        "origin": false
       }
     }
   }

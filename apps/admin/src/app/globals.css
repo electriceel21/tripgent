@@ -1,9 +1,24 @@
+/* Tripgent admin — aligned with docs/stitch (admin_home + reward_pools patterns) */
 :root {
-  --bg: #0c0f14;
-  --surface: #161b22;
-  --text: #e6edf3;
-  --muted: #8b949e;
-  --accent: #58a6ff;
+  --midnight: #0b1326;
+  --card-bg: #121d33;
+  --json-block: #080f1e;
+  --text: #e2e8f0;
+  --text-body: #cbd5e1;
+  --muted: #94a3b8;
+  --accent: #2775ca;
+  --accent-hover: #1f62a8;
+  --border: #1e293b;
+  --border-subtle: #334155;
+  --input-bg: #080f1e;
+  --status-green: #4ade80;
+  --danger: #f87171;
+  --warn-border: #c2410c;
+  --warn-bg: rgba(194, 65, 12, 0.12);
+
+  /* Legacy aliases used in older inline styles */
+  --bg: var(--midnight);
+  --surface: var(--card-bg);
 }
 
 * {
@@ -14,11 +29,212 @@ html,
 body {
   margin: 0;
   min-height: 100%;
-  font-family: ui-sans-serif, system-ui, sans-serif;
-  background: var(--bg);
-  color: var(--text);
+  background: var(--midnight);
+  color: var(--text-body);
+  -webkit-font-smoothing: antialiased;
 }
 
 a {
   color: var(--accent);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Forms — reward_pools / sponsors “Aero midnight” inputs */
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="password"],
+input[type="url"],
+select,
+textarea {
+  font: inherit;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+/* Layout helpers */
+.admin-shell {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 3rem;
+}
+
+.admin-shell--narrow {
+  max-width: 56rem;
+}
+
+.admin-kicker {
+  color: var(--accent);
+  font-size: 0.875rem;
+  margin: 0 0 0.5rem;
+  font-weight: 500;
+}
+
+.admin-page-title {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 1rem;
+  letter-spacing: -0.02em;
+}
+
+.admin-page-title--sm {
+  font-size: 1.875rem;
+}
+
+.admin-lede {
+  color: var(--muted);
+  line-height: 1.65;
+  max-width: 42rem;
+  margin: 0 0 1.5rem;
+}
+
+.admin-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.2), 0 8px 10px -6px rgb(0 0 0 / 0.2);
+}
+
+.admin-card__title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 1.25rem;
+}
+
+.admin-json-block {
+  background: var(--json-block);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  padding: 1.25rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
+  font-size: 0.8125rem;
+  color: var(--text-body);
+  overflow-x: auto;
+  margin: 0;
+}
+
+.admin-status-dot {
+  display: inline-block;
+  width: 0.65rem;
+  height: 0.65rem;
+  border-radius: 9999px;
+  margin-right: 0.5rem;
+  vertical-align: middle;
+}
+
+.admin-status-dot--ok {
+  background: var(--status-green);
+}
+
+.admin-status-dot--err {
+  background: var(--danger);
+}
+
+.admin-table-head {
+  text-align: left;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border);
+}
+
+.admin-table-row {
+  border-bottom: 1px solid var(--border);
+  transition: background-color 0.15s ease;
+}
+
+.admin-table-row:hover {
+  background: rgba(30, 41, 59, 0.45);
+}
+
+.admin-alert {
+  border-radius: 0.75rem;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+
+.admin-alert--warn {
+  background: var(--warn-bg);
+  border: 1px solid var(--warn-border);
+  color: var(--text-body);
+}
+
+.admin-alert--purple {
+  background: rgba(88, 28, 135, 0.15);
+  border: 1px solid #a78bfa;
+  color: var(--text-body);
+}
+
+.admin-footer-note {
+  font-size: 0.75rem;
+  color: var(--muted);
+  line-height: 1.6;
+  max-width: 42rem;
+}
+
+/* Tables — docs/stitch reward_pools / sponsors */
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.admin-table thead tr {
+  border-bottom: 1px solid var(--border);
+}
+
+.admin-table th {
+  padding: 0.75rem 0.5rem 0.75rem 0;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--muted);
+  text-align: left;
+}
+
+.admin-table td {
+  padding: 1rem 0.5rem 1rem 0;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--border);
+}
+
+.admin-table tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+.admin-table tbody tr:hover {
+  background: rgba(30, 41, 59, 0.45);
+}
+
+.admin-msg-error {
+  color: var(--danger);
+  margin-bottom: 1rem;
+}
+
+.admin-msg-warn {
+  color: #fbbf24;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.admin-msg-warn {
+  color: #fbbf24;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
 }

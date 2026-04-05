@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sponsors Management - Tripgent Admin</title>
+<!-- Tailwind CSS v3 CDN with plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style data-purpose="custom-theme">
+    /* Aero Midnight Theme Overrides */
+    body {
+      background-color: #0d1117;
+      color: #e6edf3;
+    }
+    .card-bg {
+      background-color: #161b22;
+      border: 1px solid #30363d;
+    }
+    .input-field {
+      background-color: #0d1117 !important;
+      border-color: #30363d !important;
+      color: #f0f6fc !important;
+    }
+    .input-field:focus {
+      border-color: #388bfd !important;
+      ring-color: #388bfd !important;
+    }
+    .table-header {
+      border-bottom: 1px solid #30363d;
+      color: #8b949e;
+    }
+    .table-row {
+      border-bottom: 1px solid #21262d;
+    }
+    .nav-link-active {
+      color: #58a6ff;
+      border-bottom: 2px solid #58a6ff;
+    }
+  </style>
+</head>
+<body class="h-full font-sans antialiased">
+<!-- BEGIN: MainHeader -->
+<header class="bg-[#0d1117] border-b border-[#30363d] px-6 py-4">
+<nav class="flex items-center space-x-8 max-w-7xl mx-auto">
+<div class="text-[#58a6ff] font-bold text-lg mr-4">Tripgent Admin</div>
+<div class="flex space-x-6 text-sm font-medium text-gray-400">
+<a class="text-[#58a6ff]" href="#">Sponsors</a>
+<a class="hover:text-gray-200 transition-colors" href="#">Locations</a>
+<a class="hover:text-gray-200 transition-colors" href="#">Pools</a>
+<a class="hover:text-gray-200 transition-colors" href="#">Offers</a>
+<a class="hover:text-gray-200 transition-colors" href="#">Users</a>
+<a class="hover:text-gray-200 transition-colors" href="#">Purchases</a>
+<a class="hover:text-gray-200 transition-colors" href="#">Rewards</a>
+</div>
+</nav>
+</header>
+<!-- END: MainHeader -->
+<!-- BEGIN: MainContent -->
+<main class="max-w-7xl mx-auto px-6 py-10">
+<!-- Page Heading -->
+<section class="mb-10">
+<h1 class="text-3xl font-bold mb-2">Sponsors</h1>
+<p class="text-gray-400 text-lg">Create and list sponsors. Slug is derived from name if omitted.</p>
+</section>
+<!-- BEGIN: FormSection -->
+<section class="card-bg rounded-xl p-8 mb-8" data-purpose="new-sponsor-form-container">
+<h2 class="text-xl font-semibold mb-6">New sponsor</h2>
+<form action="#" class="space-y-6 max-w-sm" method="POST">
+<!-- Name Input -->
+<div class="flex flex-col gap-2">
+<label class="text-sm font-medium" for="sponsor-name">Name</label>
+<input class="input-field rounded-md w-full py-2 px-3" id="sponsor-name" name="name" required="" type="text"/>
+</div>
+<!-- Slug Input -->
+<div class="flex flex-col gap-2">
+<label class="text-sm font-medium" for="sponsor-slug">Slug (optional)</label>
+<input class="input-field rounded-md w-full py-2 px-3" id="sponsor-slug" name="slug" type="text"/>
+</div>
+<!-- Website Input -->
+<div class="flex flex-col gap-2">
+<label class="text-sm font-medium" for="sponsor-website">Website (optional)</label>
+<input class="input-field rounded-md w-full py-2 px-3" id="sponsor-website" name="website" type="text"/>
+</div>
+<button class="bg-[#58a6ff] hover:bg-[#4a91e2] text-black font-semibold py-2 px-6 rounded-md transition-colors mt-2" type="submit">
+          Create
+        </button>
+</form>
+</section>
+<!-- END: FormSection -->
+<!-- BEGIN: TableSection -->
+<section class="card-bg rounded-xl p-8" data-purpose="sponsors-list-container">
+<h2 class="text-xl font-semibold mb-6">All sponsors (3)</h2>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse" id="sponsors-table">
+<thead>
+<tr class="table-header text-sm">
+<th class="pb-4 px-2 font-medium w-16">ID</th>
+<th class="pb-4 px-2 font-medium">Name</th>
+<th class="pb-4 px-2 font-medium">Slug</th>
+<th class="pb-4 px-2 font-medium">Website</th>
+<th class="pb-4 px-2 font-medium text-right"></th>
+</tr>
+</thead>
+<tbody class="text-sm">
+<!-- Row 1 -->
+<tr class="table-row">
+<td class="py-5 px-2">4</td>
+<td class="py-5 px-2 text-gray-200">Test Air</td>
+<td class="py-5 px-2 text-gray-400">test-air-1775338120592</td>
+<td class="py-5 px-2 text-gray-400">—</td>
+<td class="py-5 px-2 text-right">
+<button class="bg-[#da3633] hover:bg-[#b62320] text-white px-4 py-1.5 rounded-md text-xs font-semibold transition-colors">Delete</button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="table-row">
+<td class="py-5 px-2">3</td>
+<td class="py-5 px-2 text-gray-200">Test Air</td>
+<td class="py-5 px-2 text-gray-400">test-air-1775338065386</td>
+<td class="py-5 px-2 text-gray-400">—</td>
+<td class="py-5 px-2 text-right">
+<button class="bg-[#da3633] hover:bg-[#b62320] text-white px-4 py-1.5 rounded-md text-xs font-semibold transition-colors">Delete</button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="table-row">
+<td class="py-5 px-2 border-none">1</td>
+<td class="py-5 px-2 text-gray-200 border-none">Air Monaco</td>
+<td class="py-5 px-2 text-gray-400 border-none">air-monaco</td>
+<td class="py-5 px-2 text-gray-400 border-none">https://www.airmonaco.example</td>
+<td class="py-5 px-2 text-right border-none">
+<button class="bg-[#da3633] hover:bg-[#b62320] text-white px-4 py-1.5 rounded-md text-xs font-semibold transition-colors">Delete</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- END: TableSection -->
+</main>
+<!-- END: MainContent -->
+</body></html>

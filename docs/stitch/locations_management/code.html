@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+
+<html class="h-full bg-[#0b0f19]" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Tripgent Admin - Locations</title>
+<!-- Tailwind CSS v3 CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration for Aero Midnight Theme Colors -->
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'midnight-dark': '#0b0f19',
+            'midnight-card': '#111827',
+            'midnight-border': '#1f2937',
+            'tripgent-blue': '#60a5fa',
+            'tripgent-red': '#ef4444',
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="h-full text-slate-300 font-sans antialiased">
+<!-- BEGIN: MainHeader -->
+<header class="bg-midnight-dark border-b border-midnight-border px-6 py-4">
+<nav class="flex items-center space-x-6">
+<div class="text-tripgent-blue font-bold text-lg mr-4" data-purpose="brand-logo">Tripgent Admin</div>
+<a class="hover:text-white transition-colors" href="#">Sponsors</a>
+<a class="text-white border-b-2 border-tripgent-blue pb-1" href="#">Locations</a>
+<a class="hover:text-white transition-colors" href="#">Pools</a>
+<a class="hover:text-white transition-colors" href="#">Offers</a>
+<a class="hover:text-white transition-colors" href="#">Users</a>
+<a class="hover:text-white transition-colors" href="#">Purchases</a>
+<a class="hover:text-white transition-colors" href="#">Rewards</a>
+</nav>
+</header>
+<!-- END: MainHeader -->
+<!-- BEGIN: MainContent -->
+<main class="max-w-6xl mx-auto p-8">
+<!-- BEGIN: PageHeading -->
+<section class="mb-8" data-purpose="page-intro">
+<h1 class="text-3xl font-bold text-white mb-2">Locations</h1>
+<p class="text-slate-400">Destinations tied to an optional sponsor.</p>
+</section>
+<!-- END: PageHeading -->
+<!-- BEGIN: FormSection -->
+<section class="bg-midnight-card border border-midnight-border rounded-lg p-6 mb-8" data-purpose="new-location-form">
+<h2 class="text-xl font-semibold text-white mb-6">New location</h2>
+<form class="space-y-4 max-w-sm">
+<!-- Sponsor Dropdown -->
+<div>
+<label class="block text-sm font-medium mb-1" for="sponsor">Sponsor (optional)</label>
+<select class="w-full bg-midnight-dark border-midnight-border text-slate-300 rounded focus:ring-tripgent-blue focus:border-tripgent-blue" id="sponsor" name="sponsor">
+<option>— none —</option>
+<option>Test Air</option>
+<option>Air Monaco</option>
+</select>
+</div>
+<!-- Name Input -->
+<div>
+<label class="block text-sm font-medium mb-1" for="name">Name</label>
+<input class="w-full bg-midnight-dark border-midnight-border text-slate-300 rounded focus:ring-tripgent-blue focus:border-tripgent-blue" id="name" name="name" type="text"/>
+</div>
+<!-- Slug Input -->
+<div>
+<label class="block text-sm font-medium mb-1" for="slug">Slug (optional)</label>
+<input class="w-full bg-midnight-dark border-midnight-border text-slate-300 rounded focus:ring-tripgent-blue focus:border-tripgent-blue" id="slug" name="slug" type="text"/>
+</div>
+<!-- Country Input -->
+<div>
+<label class="block text-sm font-medium mb-1" for="country">Country (optional)</label>
+<input class="w-full bg-midnight-dark border-midnight-border text-slate-300 rounded focus:ring-tripgent-blue focus:border-tripgent-blue" id="country" name="country" type="text"/>
+</div>
+<!-- Submit Button -->
+<div class="pt-2">
+<button class="bg-tripgent-blue hover:bg-blue-400 text-midnight-dark font-bold py-2 px-6 rounded transition-colors" type="submit">
+            Create
+          </button>
+</div>
+</form>
+</section>
+<!-- END: FormSection -->
+<!-- BEGIN: ListSection -->
+<section class="bg-midnight-card border border-midnight-border rounded-lg overflow-hidden" data-purpose="locations-list">
+<div class="p-6 border-b border-midnight-border">
+<h2 class="text-xl font-semibold text-white">All locations (2)</h2>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left" id="locations-table">
+<thead>
+<tr class="text-slate-400 text-sm font-medium border-b border-midnight-border">
+<th class="px-6 py-4">ID</th>
+<th class="px-6 py-4">Name</th>
+<th class="px-6 py-4">Slug</th>
+<th class="px-6 py-4">Sponsor</th>
+<th class="px-6 py-4">Country</th>
+<th class="px-6 py-4 text-right">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-midnight-border">
+<!-- Row 1: Lisbon -->
+<tr class="hover:bg-midnight-dark/50 transition-colors">
+<td class="px-6 py-4">2</td>
+<td class="px-6 py-4 text-white">Lisbon</td>
+<td class="px-6 py-4 font-mono text-xs">lisbon-1775338120592</td>
+<td class="px-6 py-4">Test Air</td>
+<td class="px-6 py-4">PT</td>
+<td class="px-6 py-4 text-right">
+<button class="bg-tripgent-red/90 hover:bg-tripgent-red text-white text-xs font-bold py-1 px-4 rounded transition-colors">
+                  Delete
+                </button>
+</td>
+</tr>
+<!-- Row 2: Monaco -->
+<tr class="hover:bg-midnight-dark/50 transition-colors">
+<td class="px-6 py-4">1</td>
+<td class="px-6 py-4 text-white">Monaco</td>
+<td class="px-6 py-4 font-mono text-xs">monaco</td>
+<td class="px-6 py-4">Air Monaco</td>
+<td class="px-6 py-4">MC</td>
+<td class="px-6 py-4 text-right">
+<button class="bg-tripgent-red/90 hover:bg-tripgent-red text-white text-xs font-bold py-1 px-4 rounded transition-colors">
+                  Delete
+                </button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- END: ListSection -->
+</main>
+<!-- END: MainContent -->
+</body></html>
