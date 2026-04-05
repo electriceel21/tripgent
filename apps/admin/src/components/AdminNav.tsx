@@ -50,7 +50,7 @@ export function AdminNav() {
         <div style={{ display: "flex", flexWrap: "wrap", gap: "1.25rem", alignItems: "center" }}>
           {links.map(({ href, label }) => {
             const active =
-              pathname === href || (href !== "/" && pathname.startsWith(href));
+              pathname === href || pathname.startsWith(`${href}/`);
             return (
               <Link
                 key={href}
