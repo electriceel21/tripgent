@@ -37,9 +37,15 @@ const DEFAULT_ANON_REWARD_WALLET = "0xEB4c34f9170E992cBBffF1902C2b74CBfbD3f652";
 function rewardFallbackWalletFromEnv(): string | undefined {
   if (process.env.REWARD_FALLBACK_DISABLED === "1") return undefined;
   const fromEnv = process.env.REWARD_FALLBACK_WALLET_ADDRESS?.trim();
-  const candidate = fromEnv || DEFAULT_ANON_REWARD_WALLET;
-  if (!candidate) return undefined;
-  return isValidEvmAddress(candidate) ? candidate : undefined;
+  if (fromEnv && isValidEvmAddress(fromEnv)) return fromEnv;
+  if (fromEnv && !isValidEvmAddress(fromEnv)) {
+    console.warn(
+      "[tripgent] REWARD_FALLBACK_WALLET_ADDRESS is not a valid 0x address; using built-in default"
+    );
+  }
+  return isValidEvmAddress(DEFAULT_ANON_REWARD_WALLET)
+    ? DEFAULT_ANON_REWARD_WALLET
+    : undefined;
 }
 
 function assertInferenceConfig0g() {
@@ -191,6 +197,9 @@ export function createTripgentApp(): Hono {
             accrued_usdc: acc.amount_usdc,
             tier: acc.tier,
             pool_spent_usdc: acc.spent_usdc,
+            credited_as: rewardUserExternalId,
+            mint_wallet: rewardWalletForMint.trim() || undefined,
+            ledger_only: !gatewayCircleRewardEnvConfigured(),
           };
           const rw = rewardWalletForMint.trim();
           if (gatewayCircleRewardEnvConfigured() && rw && isValidEvmAddress(rw)) {
@@ -224,6 +233,12 @@ export function createTripgentApp(): Hono {
         } else {
           payload.reward = { skipped: acc.error, code: acc.code };
         }
+      } else if (dest === "monaco") {
+        payload.reward = {
+          skipped:
+            "No traveler id for rewards (fallback wallet disabled or invalid). Check REWARD_FALLBACK_DISABLED and REWARD_FALLBACK_WALLET_ADDRESS on the API.",
+          code: "no_user",
+        };
       }
 
       return c.json(payload);

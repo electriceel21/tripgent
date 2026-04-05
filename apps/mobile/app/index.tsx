@@ -22,18 +22,60 @@ const API_BEARER_FALLBACK = process.env.EXPO_PUBLIC_API_AUTH_BEARER;
 const DEFAULT_ANON_REWARD_WALLET = "0xEB4c34f9170E992cBBffF1902C2b74CBfbD3f652";
 
 function rewardFallbackWalletFromEnv(): string | undefined {
-  const w =
-    process.env.EXPO_PUBLIC_REWARD_FALLBACK_WALLET_ADDRESS?.trim() ||
-    DEFAULT_ANON_REWARD_WALLET;
-  if (w && /^0x[a-fA-F0-9]{40}$/.test(w)) return w;
-  return undefined;
+  const fromEnv = process.env.EXPO_PUBLIC_REWARD_FALLBACK_WALLET_ADDRESS?.trim();
+  if (fromEnv && /^0x[a-fA-F0-9]{40}$/.test(fromEnv)) return fromEnv;
+  if (fromEnv && !/^0x[a-fA-F0-9]{40}$/.test(fromEnv)) {
+    // Invalid override — use same default as API
+  }
+  return /^0x[a-fA-F0-9]{40}$/.test(DEFAULT_ANON_REWARD_WALLET)
+    ? DEFAULT_ANON_REWARD_WALLET
+    : undefined;
 }
 
 type ChatApiPayload = {
   message?: { content: string };
-  reward?: { accrued_usdc?: number; skipped?: string };
+  reward?: {
+    accrued_usdc?: number;
+    skipped?: string;
+    code?: string;
+    tier?: string;
+    pool_spent_usdc?: number;
+  };
   error?: string;
 };
+
+type ChatBubbleMessage = {
+  role: "user" | "assistant";
+  content: string;
+  rewardNote?: string;
+};
+
+function rewardFootnote(
+  r: ChatApiPayload["reward"] | undefined
+): string | undefined {
+  if (!r) return undefined;
+  if (typeof r.accrued_usdc === "number") {
+    const parts = [
+      `Monaco pool +${r.accrued_usdc} USDC (${r.tier ?? "bronze"} tier)`,
+      r.credited_as ? `ledger: ${r.credited_as}` : null,
+    ];
+    const cg = r.circle_gateway;
+    if (cg?.mode === "gateway_mint_submitted") {
+      parts.push("Circle Gateway mint submitted");
+    } else if (cg?.error || cg?.mode === "skipped") {
+      parts.push(`on-chain: ${cg.error ?? "skipped"}`);
+    } else if (r.ledger_only) {
+      parts.push(
+        "ledger only — USDC to your wallet needs Circle Gateway env on the server"
+      );
+    }
+    return parts.filter(Boolean).join(" · ");
+  }
+  if (r.skipped) {
+    return `Reward skipped: ${r.skipped}${r.code ? ` [${r.code}]` : ""}`;
+  }
+  return undefined;
+}
 
 function parseChatApiBody(text: string, status: number): ChatApiPayload {
   const trimmed = text.trim();
@@ -103,9 +145,7 @@ export default function ChatScreen() {
   const rewardWalletAddress = dynamicWallet ?? fb;
 
   const [input, setInput] = useState("");
-  const [messages, setMessages] = useState<
-    { role: "user" | "assistant"; content: string; rewardNote?: string }[]
-  >([]);
+  const [messages, setMessages] = useState<ChatBubbleMessage[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
