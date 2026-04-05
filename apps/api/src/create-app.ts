@@ -48,6 +48,19 @@ function rewardFallbackWalletFromEnv(): string | undefined {
     : undefined;
 }
 
+/** When set, Monaco accrual + mint always use this wallet (overrides Dynamic body fields). Demo / single-wallet testing. */
+function rewardForceWalletFromEnv(): string | undefined {
+  const w = process.env.REWARD_FORCE_WALLET_ADDRESS?.trim();
+  if (!w) return undefined;
+  if (!isValidEvmAddress(w)) {
+    console.warn(
+      "[tripgent] REWARD_FORCE_WALLET_ADDRESS is not a valid 0x address; ignoring"
+    );
+    return undefined;
+  }
+  return w;
+}
+
 function assertInferenceConfig0g() {
   return {
     rpcUrl: requireEnv("RPC_URL"),
@@ -134,7 +147,9 @@ export function createTripgentApp(): Hono {
     }
 
     let systemContent = TRAVEL_SYSTEM;
-    const dest = body.destination_slug?.trim().toLowerCase();
+    const destRaw = body.destination_slug?.trim().toLowerCase();
+    const destDefault = process.env.TRIPGENT_DEFAULT_DESTINATION_SLUG?.trim().toLowerCase();
+    const dest = destRaw || destDefault || "";
     if (dest === "monaco") {
       systemContent += "\n\n" + (await buildMonacoSystemAugmentation(supabase));
     }
@@ -178,11 +193,16 @@ export function createTripgentApp(): Hono {
       };
 
       const fbWallet = rewardFallbackWalletFromEnv();
-      const rewardUserExternalId =
-        body.user_external_id?.trim() ||
-        (fbWallet ? `wallet:${fbWallet.toLowerCase()}` : "");
+      const forceWallet = rewardForceWalletFromEnv();
+      const rewardUserExternalId = forceWallet
+        ? `wallet:${forceWallet.toLowerCase()}`
+        : body.user_external_id?.trim() ||
+          (fbWallet ? `wallet:${fbWallet.toLowerCase()}` : "");
       const rewardWalletForMint =
-        body.reward_wallet_address?.trim() || fbWallet || "";
+        forceWallet ||
+        body.reward_wallet_address?.trim() ||
+        fbWallet ||
+        "";
 
       if (dest === "monaco" && rewardUserExternalId) {
         const acc = await accrueSponsorTierReward(supabase, {
@@ -200,6 +220,7 @@ export function createTripgentApp(): Hono {
             credited_as: rewardUserExternalId,
             mint_wallet: rewardWalletForMint.trim() || undefined,
             ledger_only: !gatewayCircleRewardEnvConfigured(),
+            ...(forceWallet ? { wallet_source: "REWARD_FORCE_WALLET_ADDRESS" } : {}),
           };
           const rw = rewardWalletForMint.trim();
           if (gatewayCircleRewardEnvConfigured() && rw && isValidEvmAddress(rw)) {
@@ -231,6 +252,11 @@ export function createTripgentApp(): Hono {
             };
           }
         } else {
+          console.warn(
+            "[tripgent] Monaco reward accrual skipped:",
+            acc.code,
+            acc.error
+          );
           payload.reward = { skipped: acc.error, code: acc.code };
         }
       } else if (dest === "monaco") {

@@ -32,6 +32,13 @@ function rewardFallbackWalletFromEnv(): string | undefined {
     : undefined;
 }
 
+/** When set, always send this 0x for accrual + mint (overrides Dynamic wallet while logged in). Matches API `REWARD_FORCE_WALLET_ADDRESS`. */
+function rewardForceWalletFromEnv(): string | undefined {
+  const w = process.env.EXPO_PUBLIC_REWARD_FORCE_WALLET_ADDRESS?.trim();
+  if (w && /^0x[a-fA-F0-9]{40}$/.test(w)) return w;
+  return undefined;
+}
+
 type ChatApiPayload = {
   message?: { content: string };
   reward?: {
@@ -138,11 +145,13 @@ export default function ChatScreen() {
   const client = useReactiveClient(dynamicClient);
   const authToken = client.auth.token;
   const fb = rewardFallbackWalletFromEnv();
+  const forceW = rewardForceWalletFromEnv();
   const dynamicUser = externalUserIdFromDynamic(client);
   const dynamicWallet = rewardWalletAddressFromDynamic(client);
-  const externalUserId =
-    dynamicUser ?? (fb ? `wallet:${fb.toLowerCase()}` : undefined);
-  const rewardWalletAddress = dynamicWallet ?? fb;
+  const externalUserId = forceW
+    ? `wallet:${forceW.toLowerCase()}`
+    : dynamicUser ?? (fb ? `wallet:${fb.toLowerCase()}` : undefined);
+  const rewardWalletAddress = forceW ?? dynamicWallet ?? fb;
 
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<ChatBubbleMessage[]>([]);
